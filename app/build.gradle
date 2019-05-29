@@ -39,17 +39,16 @@ dependencies {
 //    Firebase
     implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.google.firebase:firebase-auth:17.0.0'
-
+    implementation 'com.google.firebase:firebase-firestore:19.0.1'
 //    Firebase UI
     implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
-
+    implementation 'com.firebaseui:firebase-ui-firestore:5.0.0'
 //    Facebook
     implementation 'com.facebook.android:facebook-android-sdk:4.42.0'
 //    Twitter
     implementation('com.twitter.sdk.android:twitter:3.3.0@aar') {
         transitive = true
     }
-
 
 
 //    Test

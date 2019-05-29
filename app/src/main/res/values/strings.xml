@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">Go4Lunch</string>
 
-    <string name="facebook_app_id">296011911276762</string>
+    <string name="facebook_application_id">296011911276762</string>
     <string name="fb_login_protocol_scheme">fb296011911276762</string>
 
     <string name="twitter_consumer_key" translatable="false">SZ2vdqtLXeURjnJJCsXpTzp0M</string>
     <string name="twitter_consumer_secret" translatable="false">mtDEAfWuglWmXzLeumYRWzM8qBhunolhVDZ0g4TQ3FIUrBOpb5</string>
+
+    <string name="auth_failed">Authentification failed, please try again</string>
+    <string name="network_access">Network Access is necessary to sign in</string>
+    <string name="unknown_error">There is an unknown error</string>
 
 </resources>

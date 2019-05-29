@@ -9,4 +9,8 @@
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
     </style>
 
+    <style name="LoginTheme" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+    </style>
+
 </resources>
