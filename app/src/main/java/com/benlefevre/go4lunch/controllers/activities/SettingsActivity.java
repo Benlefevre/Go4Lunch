@@ -1,6 +1,5 @@
 package com.benlefevre.go4lunch.controllers.activities;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;

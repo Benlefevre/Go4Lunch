@@ -13,6 +13,8 @@ android {
     }
     buildTypes {
         debug {
+            buildConfigField("String","google_maps_key",GOOGLE_MAPS_API_KEY)
+            resValue("string","google_maps_key",GOOGLE_MAPS_API_KEY)
         }
         release {
             minifyEnabled false
@@ -54,6 +56,15 @@ dependencies {
     implementation('com.twitter.sdk.android:twitter:3.3.0@aar') {
         transitive = true
     }
+
+//    Google Map
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+//    Google Map Utils
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
+//    Google Places
+    implementation 'com.google.android.libraries.places:places:1.1.0'
+//    Google Play Location
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
 
 
 //    Test

@@ -1,7 +1,11 @@
 package com.benlefevre.go4lunch.controllers.activities;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -9,8 +13,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -23,6 +30,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.benlefevre.go4lunch.utils.Constants.MAP;
+import static com.benlefevre.go4lunch.utils.Constants.PERMISSIONS_REQUEST_ACCESS_LOCATION;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
+import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -37,16 +49,25 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     @BindView(R.id.home_activity_drawer)
     DrawerLayout mDrawer;
 
+    private boolean mLocationPermissionGranted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+        getLocationPermission();
         configureToolbar();
         configureDrawerLayout();
         configureNavigationView();
         configureBottomNav();
         updateUiNavHeader();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home_activity_toolbar_menu,menu);
+        return true;
     }
 
     /**
@@ -114,14 +135,77 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 startActivity(new Intent(this,SettingsActivity.class));
                 break;
             case R.id.bottom_map:
+                mToolbar.setTitle(R.string.hungry);
+                displayFragmentAccordingToItemSelected(MAP);
                 break;
             case R.id.bottom_restaurant:
+                mToolbar.setTitle(R.string.hungry);
+                displayFragmentAccordingToItemSelected(RESTAURANT);
                 break;
             case R.id.bottom_workmates:
+                mToolbar.setTitle(R.string.available_workmates);
+                displayFragmentAccordingToItemSelected(WORKMATES);
                 break;
         }
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Displays a fragment according to the selected item in bottom navigation.
+     * @param origin A constant String that represented the selected item
+     */
+    private void displayFragmentAccordingToItemSelected(String origin) {
+        switch (origin){
+            case MAP:
+                break;
+            case RESTAURANT:
+                break;
+            case WORKMATES:
+                break;
+        }
+    }
+
+    /**
+     * Checks if the application has the user's permissions to locate him.
+     */
+    private void getLocationPermission(){
+        if((ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&
+        (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
+            mLocationPermissionGranted = true;
+        }else{
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)
+            && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_COARSE_LOCATION)){
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.why_location))
+                        .setMessage(getString(R.string.without_location))
+                        .setPositiveButton(getString(R.string.allow), (dialog, which) -> {
+                            dialog.cancel();
+                            ActivityCompat.requestPermissions(HomeActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    PERMISSIONS_REQUEST_ACCESS_LOCATION);
+                        })
+                        .setNegativeButton(getString(R.string.deny), (dialog, which) -> dialog.cancel())
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(HomeActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+                        PERMISSIONS_REQUEST_ACCESS_LOCATION);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == PERMISSIONS_REQUEST_ACCESS_LOCATION){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                mLocationPermissionGranted = true;
+            }else {
+                getLocationPermission();
+            }
+        }
     }
 
     /**

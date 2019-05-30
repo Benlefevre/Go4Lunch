@@ -35,5 +35,10 @@
     <string name="cancel">Cancel</string>
     <string name="account_deleted">Your account is successfully deleted</string>
     <string name="re_auth_to_delete">You need to re-authenticate one more time to delete your account.</string>
+    <string name="available_workmates">Available workmates</string>
+    <string name="deny">Deny</string>
+    <string name="allow">Allow</string>
+    <string name="without_location">Without the location permissions, we can\'t locate your position and restaurants around you</string>
+    <string name="why_location">Why we need  location permissions</string>
 
 </resources>
