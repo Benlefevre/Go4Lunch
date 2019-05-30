@@ -11,7 +11,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controllers.activities.HomeActivity"></activity>
+        <activity android:name=".controllers.activities.SettingsActivity"
+            android:parentActivityName=".controllers.activities.HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.HomeActivity"/>
+        </activity>
+        <activity android:name=".controllers.activities.HomeActivity" />
         <activity android:name=".controllers.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

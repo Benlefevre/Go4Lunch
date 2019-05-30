@@ -39,4 +39,12 @@ public class UserHelper {
     public static Task<DocumentSnapshot> getUser(String uid){
         return getUsersCollection().document(uid).get();
     }
+
+    /**
+     * Deletes into Firestore the document corresponding to the selected user
+     * @param uid The selected user's uid
+     */
+    public static Task<Void> deleteUser(String uid){
+        return getUsersCollection().document(uid).delete();
+    }
 }

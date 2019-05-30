@@ -24,5 +24,16 @@
     <string name="user_s_profile_s_photo">User\'s profile\'s photo</string>
     <string name="user_s_mail">User\'s mail</string>
     <string name="user_s_name">User\'s name</string>
+    <string name="notifications">Notifications</string>
+    <string name="enable_notif">Enable message notification</string>
+    <string name="notif_summary">Allow Go4Lunch to send you a notification at 12:00 AM when you chose a restaurant for lunch</string>
+    <string name="user_account">User Account</string>
+    <string name="setting">Settings</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="are_you_sure_delete">Are you sure that you want delete your account ?</string>
+    <string name="yes_sure">Yes, I\'m sure</string>
+    <string name="cancel">Cancel</string>
+    <string name="account_deleted">Your account is successfully deleted</string>
+    <string name="re_auth_to_delete">You need to re-authenticate one more time to delete your account.</string>
 
 </resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/notifications">
+
+        <SwitchPreference
+            android:key="notification"
+            android:title="@string/enable_notif"
+            android:summary="@string/notif_summary"
+            android:defaultValue="true"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/user_account">
+
+        <Preference
+            android:key="account"
+            android:title="Delete account and log out"
+            android:summary="Click here if you want delete your Go4Lunch account"/>
+
+    </PreferenceCategory>
+</PreferenceScreen>

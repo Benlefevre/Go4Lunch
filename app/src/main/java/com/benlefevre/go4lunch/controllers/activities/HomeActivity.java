@@ -1,5 +1,6 @@
 package com.benlefevre.go4lunch.controllers.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -98,9 +99,29 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         setSupportActionBar(mToolbar);
     }
 
+    /**
+     * Defines an action according to the selected item in navigation drawer or bottom navigation.
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+        switch(item.getItemId()){
+            case R.id.drawer_logout:
+                signOutFromFirebase();
+                break;
+            case R.id.drawer_your_lunch:
+                break;
+            case R.id.drawer_settings:
+                startActivity(new Intent(this,SettingsActivity.class));
+                break;
+            case R.id.bottom_map:
+                break;
+            case R.id.bottom_restaurant:
+                break;
+            case R.id.bottom_workmates:
+                break;
+        }
+        mDrawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     /**
