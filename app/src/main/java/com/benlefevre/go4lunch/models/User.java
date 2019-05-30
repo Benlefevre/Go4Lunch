@@ -18,7 +18,7 @@ public class User {
     }
 
 
-//    Getters
+//  -----------------------------------  Getters  --------------------------------------------------
 
     public String getUid() {
         return uid;
@@ -36,7 +36,7 @@ public class User {
         return urlPhoto;
     }
 
-//    Setters
+//  -----------------------------------  Setters  --------------------------------------------------
 
 
     public void setUid(String uid) {
