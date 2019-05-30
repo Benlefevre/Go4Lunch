@@ -93,7 +93,7 @@
         android:drawableStart="@drawable/fui_ic_twitter_bird_white_24dp"
         android:paddingStart="30dp"
         android:paddingEnd="30dp"
-        android:text="@string/fui_sign_in_with_facebook"
+        android:text="@string/fui_sign_in_with_twitter"
         android:textColor="@color/design_default_color_surface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

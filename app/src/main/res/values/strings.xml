@@ -10,5 +10,19 @@
     <string name="auth_failed">Authentification failed, please try again</string>
     <string name="network_access">Network Access is necessary to sign in</string>
     <string name="unknown_error">There is an unknown error</string>
+    <string name="your_lunch">YOUR LUNCH</string>
+    <string name="settings">SETTINGS</string>
+    <string name="logout">LOGOUT</string>
+    <string name="map_view">Map View</string>
+    <string name="restaurant_list">Restaurant List</string>
+    <string name="workmates">Workmates</string>
+    <string name="search">Search</string>
+    <string name="hungry">I\'m Hungry</string>
+    <string name="open_drawer">Open navigation drawer</string>
+    <string name="close_drawer">Close navigation drawer</string>
+    <string name="go4lunch">Go4Lunch</string>
+    <string name="user_s_profile_s_photo">User\'s profile\'s photo</string>
+    <string name="user_s_mail">User\'s mail</string>
+    <string name="user_s_name">User\'s name</string>
 
 </resources>
