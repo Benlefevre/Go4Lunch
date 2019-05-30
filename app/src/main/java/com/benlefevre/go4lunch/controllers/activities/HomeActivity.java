@@ -1,7 +1,6 @@
 package com.benlefevre.go4lunch.controllers.activities;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -20,8 +19,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 
 import com.benlefevre.go4lunch.R;
+import com.benlefevre.go4lunch.controllers.fragments.MapViewFragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,13 +51,23 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout mDrawer;
 
     private boolean mLocationPermissionGranted = false;
+    private FragmentManager mFragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+        mFragmentManager = getSupportFragmentManager();
         getLocationPermission();
+        initUi();
+
+    }
+
+    /**
+     * Calls all methods needed to update the ui.
+     */
+    private void initUi() {
         configureToolbar();
         configureDrawerLayout();
         configureNavigationView();
@@ -158,6 +169,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     private void displayFragmentAccordingToItemSelected(String origin) {
         switch (origin){
             case MAP:
+                MapViewFragment mapViewFragment;
+                if (mFragmentManager.findFragmentByTag("mapView") != null)
+                    mapViewFragment = (MapViewFragment) mFragmentManager.findFragmentByTag("mapView");
+                else
+                    mapViewFragment = (MapViewFragment) MapViewFragment.newInstance(mLocationPermissionGranted);
+
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout,mapViewFragment)
+                        .commit();
                 break;
             case RESTAURANT:
                 break;
@@ -174,6 +193,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&
         (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
             mLocationPermissionGranted = true;
+            showFirstFragment();
         }else{
             if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)
             && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_COARSE_LOCATION)){
@@ -202,10 +222,17 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         if(requestCode == PERMISSIONS_REQUEST_ACCESS_LOCATION){
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 mLocationPermissionGranted = true;
+                showFirstFragment();
             }else {
                 getLocationPermission();
             }
         }
+    }
+
+    private void showFirstFragment(){
+        mFragmentManager.beginTransaction()
+                .add(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted),"mapView")
+                .commit();
     }
 
     /**

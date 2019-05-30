@@ -15,4 +15,5 @@ public class Constants {
     public static final String WORKMATES = "workmates";
 
     public static final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
+    public static final String PERMISSION_GRANTED = "permission";
 }
