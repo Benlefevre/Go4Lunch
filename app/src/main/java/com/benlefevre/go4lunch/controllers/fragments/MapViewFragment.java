@@ -1,6 +1,7 @@
 package com.benlefevre.go4lunch.controllers.fragments;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -22,8 +24,19 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static com.benlefevre.go4lunch.utils.Constants.DEFAULT_LOCATION;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
@@ -37,8 +50,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Activity mActivity;
     private LatLng mLastKnownLocation;
+
     private MapView mMapView;
     private GoogleMap mGoogleMap;
+    private PlacesClient mPlacesClient;
 
     public MapViewFragment() {
         // Required empty public constructor
@@ -76,39 +91,102 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      * Initializes needed fields to use GoogleMap and Places APIS.
      */
     private void initMapAndPlaces() {
-        if(getArguments() != null)
+        if (getArguments() != null)
             mLocationPermissionGranted = getArguments().getBoolean(PERMISSION_GRANTED);
-        mLastKnownLocation = new LatLng(DEFAULT_LOCATION.latitude,DEFAULT_LOCATION.longitude);
+        mLastKnownLocation = new LatLng(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mActivity);
+        Places.initialize(mActivity, BuildConfig.google_maps_key);
+        mPlacesClient = Places.createClient(mActivity);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+//        Sets mGoogleMap's style without poi.
         mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(mActivity, R.raw.json_style_map));
+//        Request the user's location.
         getLastKnownLocation();
     }
-
 
     /**
      * Gets the last known location with google location services and move the GoogleMap's camera to
      * the user's position.
      */
     private void getLastKnownLocation() {
-        try{
-            if (mLocationPermissionGranted){
+        try {
+            if (mLocationPermissionGranted) {
                 mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                    if(location != null){
-                        mLastKnownLocation = new LatLng(location.getLatitude(),location.getLongitude());
+                    if (location != null) {
+                        mLastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
                         mGoogleMap.setMyLocationEnabled(true);
-                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation,19));
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 19));
 
                     }
                 });
             }
-        }catch (SecurityException e){
-            Log.e("Exception : $%s",e.getMessage());
+        } catch (SecurityException e) {
+            Log.e("Exception : $%s", e.getMessage());
         }
+        fetchPlacesAroundUser();
+    }
+
+    /**
+     * Fetches places around the user's location into GoogleMaps server
+     */
+    @SuppressLint("MissingPermission")
+    private void fetchPlacesAroundUser() {
+//        Defines witch fields we want in the query's response.
+        List<Place.Field> fields = Arrays.asList(Place.Field.TYPES, Place.Field.ID);
+//        Creates the request with the defined fields.
+        FindCurrentPlaceRequest placeRequest = FindCurrentPlaceRequest.builder(fields).build();
+//        Requests GoogleMap's server to fetch places around user
+        mPlacesClient.findCurrentPlace(placeRequest).addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                FindCurrentPlaceResponse response = task.getResult();
+                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+//                        Verifies if the place's type corresponding to restaurants.
+                    if (placeLikelihood.getPlace().getTypes() != null &&
+                            (placeLikelihood.getPlace().getTypes().contains(Place.Type.RESTAURANT)
+                            || placeLikelihood.getPlace().getTypes().contains(Place.Type.BAR) ||
+                            placeLikelihood.getPlace().getTypes().contains(Place.Type.MEAL_TAKEAWAY))) {
+//                            Request details for each place corresponding to wanted types.
+                        fetchDetailsAboutRestaurants(placeLikelihood.getPlace().getId());
+                    }
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Fetches place's details according to the place's Id passed in argument.
+     *
+     * @param placeId The place's id that we want details.
+     */
+    private void fetchDetailsAboutRestaurants(String placeId) {
+//        Defines witch fields we want in the query's response.
+        List<Place.Field> fields = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS,
+                Place.Field.ADDRESS_COMPONENTS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI,
+                Place.Field.OPENING_HOURS, Place.Field.RATING);
+//        Creates the request with the defined fields about the given place.
+        FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(placeId, fields).build();
+//        Requests GoogleMap's server to fetch place's details.
+        mPlacesClient.fetchPlace(placeRequest).addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                Place place = (task.getResult()).getPlace();
+                addMarkerOnMap(place);
+            }
+        });
+    }
+
+    /**
+     * Adds a marker on map according to the place's location and the place's name.
+     *
+     * @param place The place for witch to add a marker.
+     */
+    private void addMarkerOnMap(Place place) {
+        if (place.getLatLng() != null)
+            mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
     }
 
     @Override
