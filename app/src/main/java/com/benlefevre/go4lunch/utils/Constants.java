@@ -1,5 +1,7 @@
 package com.benlefevre.go4lunch.utils;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Constants {
 
     public static final String PREFERENCES = "sharedPreferences";
@@ -16,4 +18,6 @@ public class Constants {
 
     public static final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     public static final String PERMISSION_GRANTED = "permission";
+
+    public static final LatLng DEFAULT_LOCATION = new LatLng(48.852686,2.337957);
 }

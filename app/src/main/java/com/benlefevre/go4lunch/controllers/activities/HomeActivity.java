@@ -61,7 +61,6 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         mFragmentManager = getSupportFragmentManager();
         getLocationPermission();
         initUi();
-
     }
 
     /**
@@ -77,7 +76,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_activity_toolbar_menu,menu);
+        getMenuInflater().inflate(R.menu.home_activity_toolbar_menu, menu);
         return true;
     }
 
@@ -136,14 +135,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.drawer_logout:
                 signOutFromFirebase();
                 break;
             case R.id.drawer_your_lunch:
                 break;
             case R.id.drawer_settings:
-                startActivity(new Intent(this,SettingsActivity.class));
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.bottom_map:
                 mToolbar.setTitle(R.string.hungry);
@@ -164,10 +163,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
     /**
      * Displays a fragment according to the selected item in bottom navigation.
+     *
      * @param origin A constant String that represented the selected item
      */
     private void displayFragmentAccordingToItemSelected(String origin) {
-        switch (origin){
+        switch (origin) {
             case MAP:
                 MapViewFragment mapViewFragment;
                 if (mFragmentManager.findFragmentByTag("mapView") != null)
@@ -175,7 +175,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 else
                     mapViewFragment = (MapViewFragment) MapViewFragment.newInstance(mLocationPermissionGranted);
 
-                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout,mapViewFragment)
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment)
                         .commit();
                 break;
             case RESTAURANT:
@@ -186,31 +186,31 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     /**
-     * Checks if the application has the user's permissions to locate him.
+     * Checks if the application has the user's permissions to locate him and requests them if it's haven't.
      */
-    private void getLocationPermission(){
-        if((ContextCompat.checkSelfPermission(this,
+    private void getLocationPermission() {
+        if ((ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&
-        (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             mLocationPermissionGranted = true;
             showFirstFragment();
-        }else{
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)
-            && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_COARSE_LOCATION)){
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.why_location))
                         .setMessage(getString(R.string.without_location))
                         .setPositiveButton(getString(R.string.allow), (dialog, which) -> {
                             dialog.cancel();
                             ActivityCompat.requestPermissions(HomeActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                                     PERMISSIONS_REQUEST_ACCESS_LOCATION);
                         })
                         .setNegativeButton(getString(R.string.deny), (dialog, which) -> dialog.cancel())
                         .show();
             } else {
                 ActivityCompat.requestPermissions(HomeActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                         PERMISSIONS_REQUEST_ACCESS_LOCATION);
             }
         }
@@ -219,19 +219,22 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == PERMISSIONS_REQUEST_ACCESS_LOCATION){
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionGranted = true;
                 showFirstFragment();
-            }else {
+            } else {
                 getLocationPermission();
             }
         }
     }
 
-    private void showFirstFragment(){
+    /**
+     * Load a MapViewFragment as first screen when the user arrives in HomeActivity.
+     */
+    private void showFirstFragment() {
         mFragmentManager.beginTransaction()
-                .add(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted),"mapView")
+                .add(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), "mapView")
                 .commit();
     }
 
