@@ -4,6 +4,7 @@ package com.benlefevre.go4lunch.controllers.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +46,9 @@ import java.util.List;
 
 import static com.benlefevre.go4lunch.utils.Constants.DEFAULT_LOCATION;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
+import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+import static com.benlefevre.go4lunch.utils.Constants.USER_LAT;
+import static com.benlefevre.go4lunch.utils.Constants.USER_LONG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,6 +61,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Activity mActivity;
     private LatLng mLastKnownLocation;
+    private SharedPreferences mSharedPreferences;
 
     private MapView mMapView;
     private GoogleMap mGoogleMap;
@@ -80,6 +85,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
+        mSharedPreferences = mActivity.getSharedPreferences(PREFERENCES,Context.MODE_PRIVATE);
         mIdList = new ArrayList<>();
         initMapAndPlaces();
 
@@ -127,6 +133,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
                     if (location != null) {
                         mLastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        mSharedPreferences.edit().putFloat(USER_LAT, (float) mLastKnownLocation.latitude).apply();
+                        mSharedPreferences.edit().putFloat(USER_LONG, (float) mLastKnownLocation.longitude).apply();
                         mGoogleMap.setMyLocationEnabled(true);
                         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 18));
 

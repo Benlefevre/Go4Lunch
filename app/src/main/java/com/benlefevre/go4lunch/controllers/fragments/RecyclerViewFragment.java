@@ -2,6 +2,7 @@ package com.benlefevre.go4lunch.controllers.fragments;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.adapters.RestaurantAdapter;
 import com.benlefevre.go4lunch.api.RestaurantHelper;
+import com.benlefevre.go4lunch.controllers.activities.RestaurantActivity;
 import com.benlefevre.go4lunch.models.Restaurant;
+import com.benlefevre.go4lunch.views.RestaurantViewHolder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +32,7 @@ import butterknife.ButterKnife;
 import static com.benlefevre.go4lunch.utils.Constants.ID_LIST;
 import static com.benlefevre.go4lunch.utils.Constants.ORIGIN;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,8 +92,10 @@ public class RecyclerViewFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         switch (origin) {
             case RESTAURANT:
-                mIdList = getArguments().getStringArrayList(ID_LIST);
-                fetchRestaurantInFirestore(mIdList);
+                if (getArguments() != null) {
+                    mIdList = getArguments().getStringArrayList(ID_LIST);
+                    fetchRestaurantInFirestore(mIdList);
+                }
                 break;
         }
     }
@@ -103,24 +109,31 @@ public class RecyclerViewFragment extends Fragment {
         mRestaurantList = new ArrayList<>();
         for (String restaurantId : idList) {
             RestaurantHelper.getRestaurant(restaurantId).addOnSuccessListener(documentSnapshot -> {
-               if (documentSnapshot.exists()) {
+                if (documentSnapshot.exists()) {
                     Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
                     mRestaurantList.add(restaurant);
-               }
+                }
 //               When all restaurant are fetched, we configure the RecyclerView's adapter.
-               if (mRestaurantList.size() == mIdList.size()){
-                   configureRecyclerViewForRestaurants();
-               }
+                if (mRestaurantList.size() == mIdList.size()) {
+                    configureRecyclerViewForRestaurants();
+                }
             });
         }
     }
 
 
     /**
-     * Configure the RecyclerView with the correct adapter
+     * Configures the RecyclerView with a  RestaurantAdapter and sets an ItemClickListener and it's action.
      */
     private void configureRecyclerViewForRestaurants() {
         RestaurantAdapter restaurantAdapter = new RestaurantAdapter(mRestaurantList);
+        restaurantAdapter.setOnItemClickListener(v -> {
+            RestaurantViewHolder holder = (RestaurantViewHolder) v.getTag();
+            int position = holder.getAdapterPosition();
+            Intent intent = new Intent(mActivity, RestaurantActivity.class);
+            intent.putExtra(RESTAURANT_NAME, mRestaurantList.get(position).getName());
+            startActivity(intent);
+        });
         mRecyclerView.setAdapter(restaurantAdapter);
         restaurantAdapter.notifyDataSetChanged();
     }

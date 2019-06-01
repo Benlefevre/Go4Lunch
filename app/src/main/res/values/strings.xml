@@ -46,5 +46,10 @@
     <string name="restaurant_name">restaurant_name</string>
     <string name="rating_star_value">rating star value</string>
     <string name="a_photo_of_the_restaurant">A photo of the restaurant</string>
+    <string name="no_info_hours">There is no information about the opening hours</string>
+    <string name="closing_soon">Closing soon</string>
+    <string name="open_until">Open until</string>
+    <string name="closed">Closed</string>
+    <string name="meters">%1$d m</string>
 
 </resources>
