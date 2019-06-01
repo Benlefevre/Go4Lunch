@@ -23,21 +23,27 @@ import androidx.fragment.app.FragmentManager;
 
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.controllers.fragments.MapViewFragment;
+import com.benlefevre.go4lunch.controllers.fragments.RecyclerViewFragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.benlefevre.go4lunch.utils.Constants.MAP;
+import static com.benlefevre.go4lunch.utils.Constants.MAPVIEW;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSIONS_REQUEST_ACCESS_LOCATION;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_FRAGMENT;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 
-public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, MapViewFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.home_activity_toolbar)
     Toolbar mToolbar;
@@ -52,6 +58,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
     private boolean mLocationPermissionGranted = false;
     private FragmentManager mFragmentManager;
+    private List<String> mIdList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,15 +177,23 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         switch (origin) {
             case MAP:
                 MapViewFragment mapViewFragment;
-                if (mFragmentManager.findFragmentByTag("mapView") != null)
-                    mapViewFragment = (MapViewFragment) mFragmentManager.findFragmentByTag("mapView");
+                if (mFragmentManager.findFragmentByTag(MAPVIEW) != null)
+                    mapViewFragment = (MapViewFragment) mFragmentManager.findFragmentByTag(MAPVIEW);
                 else
                     mapViewFragment = (MapViewFragment) MapViewFragment.newInstance(mLocationPermissionGranted);
 
-                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment)
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment,MAPVIEW)
                         .commit();
                 break;
             case RESTAURANT:
+                RecyclerViewFragment recyclerViewFragment;
+                if (mFragmentManager.findFragmentByTag(RESTAURANT_FRAGMENT) != null)
+                    recyclerViewFragment = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(RESTAURANT_FRAGMENT);
+                else
+                    recyclerViewFragment = RecyclerViewFragment.newInstance(RESTAURANT, mIdList);
+
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, recyclerViewFragment,RESTAURANT_FRAGMENT)
+                        .commit();
                 break;
             case WORKMATES:
                 break;
@@ -234,7 +249,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      */
     private void showFirstFragment() {
         mFragmentManager.beginTransaction()
-                .add(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), "mapView")
+                .add(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), MAPVIEW)
                 .commit();
     }
 
@@ -249,4 +264,9 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
             super.onBackPressed();
     }
 
+    @Override
+    public void onFragmentInteraction(List<String> idList) {
+        mIdList = new ArrayList<>();
+        mIdList = idList;
+    }
 }

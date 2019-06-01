@@ -20,4 +20,10 @@ public class Constants {
     public static final String PERMISSION_GRANTED = "permission";
 
     public static final LatLng DEFAULT_LOCATION = new LatLng(48.852686,2.337957);
+
+    public static final String ORIGIN = "origin";
+    public static final String ID_LIST = "idList";
+
+    public static final String MAPVIEW = "mapView";
+    public static final String RESTAURANT_FRAGMENT = "restaurantFragment";
 }

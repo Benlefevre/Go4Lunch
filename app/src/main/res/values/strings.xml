@@ -40,5 +40,11 @@
     <string name="allow">Allow</string>
     <string name="without_location">Without the location permissions, we can\'t locate your position and restaurants around you</string>
     <string name="why_location">Why we need  location permissions</string>
+    <string name="restaurant_opening_hour">restaurant_opening_hour</string>
+    <string name="restaurant_address">restaurant_address</string>
+    <string name="dist">dist</string>
+    <string name="restaurant_name">restaurant_name</string>
+    <string name="rating_star_value">rating star value</string>
+    <string name="a_photo_of_the_restaurant">A photo of the restaurant</string>
 
 </resources>

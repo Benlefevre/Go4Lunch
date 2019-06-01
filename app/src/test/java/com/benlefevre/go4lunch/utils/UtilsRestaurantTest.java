@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,16 +24,15 @@ public class UtilsRestaurantTest {
 
     @Test
     public void formatAddress(){
-//        Init Values
-        String formattedAddress = "10 Avenue Benoit 75000 Paris";
+        String formattedAddress = "10 Avenue Benoit, 75000 Paris, France";
 
         AddressComponent address1 = mock(AddressComponent.class);
-        when(address1.getTypes()).thenReturn(Arrays.asList("street_number"));
+        when(address1.getTypes()).thenReturn(Collections.singletonList("street_number"));
         when(address1.getName()).thenReturn("10");
 
         AddressComponent address2 = mock(AddressComponent.class);
-        when(address2.getTypes()).thenReturn(Arrays.asList("route"));
-        when(address2.getName()).thenReturn(" Avenue Benoit");
+        when(address2.getTypes()).thenReturn(Collections.singletonList("route"));
+        when(address2.getName()).thenReturn("Avenue Benoit");
 
         List<AddressComponent> addressComponents = new ArrayList<>();
         addressComponents.add(address1);
@@ -40,18 +40,18 @@ public class UtilsRestaurantTest {
 
         assertEquals("10 Avenue Benoit",UtilsRestaurant.formatAddress(formattedAddress,addressComponents));
 
-        when(address1.getTypes()).thenReturn(Arrays.asList("locality"));
+        when(address1.getTypes()).thenReturn(Collections.singletonList("locality"));
         when(address1.getName()).thenReturn("Paris");
 
-        when(address2.getTypes()).thenReturn(Arrays.asList("postal_code"));
+        when(address2.getTypes()).thenReturn(Collections.singletonList("postal_code"));
         when(address2.getName()).thenReturn("75000");
 
-        assertEquals(formattedAddress,UtilsRestaurant.formatAddress(formattedAddress,addressComponents));
+        assertEquals("10 Avenue Benoit",UtilsRestaurant.formatAddress(formattedAddress,addressComponents));
 
         address1 = null;
         address2 = null;
 
-        assertEquals(formattedAddress,UtilsRestaurant.formatAddress(formattedAddress,addressComponents));
+        assertEquals("10 Avenue Benoit",UtilsRestaurant.formatAddress(formattedAddress,addressComponents));
 
         formattedAddress = null;
 

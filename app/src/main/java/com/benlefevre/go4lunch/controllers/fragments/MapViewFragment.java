@@ -51,6 +51,8 @@ import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
  */
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
+    private OnFragmentInteractionListener mListener;
+
     private boolean mLocationPermissionGranted;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Activity mActivity;
@@ -126,7 +128,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                     if (location != null) {
                         mLastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
                         mGoogleMap.setMyLocationEnabled(true);
-                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 19));
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 18));
 
                     }
                 });
@@ -156,11 +158,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                             (placeLikelihood.getPlace().getTypes().contains(Place.Type.RESTAURANT)
                                     || placeLikelihood.getPlace().getTypes().contains(Place.Type.BAR) ||
                                     placeLikelihood.getPlace().getTypes().contains(Place.Type.MEAL_TAKEAWAY))) {
-//                            Request details for each place corresponding to wanted types.
+//                        Adds each place's id in a list to pass it to HomeActivity
+                        mIdList.add(placeLikelihood.getPlace().getId());
+//                        Requests details for each place corresponding to wanted types.
                         fetchDetailsAboutRestaurants(placeLikelihood.getPlace().getId());
                     }
                 }
-
+                mListener.onFragmentInteraction(mIdList);
             }
         });
     }
@@ -182,7 +186,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             if (task.isSuccessful() && task.getResult() != null) {
                 Place place = (task.getResult()).getPlace();
                 addMarkerOnMap(place);
-                mIdList.add(placeId);
                 saveRestaurantInFirestore(placeId,place);
 
             }
@@ -227,6 +230,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        if (context instanceof MapViewFragment.OnFragmentInteractionListener)
+            mListener = (OnFragmentInteractionListener) context;
+        else
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
     }
 
     @Override
@@ -268,5 +275,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnFragmentInteractionListener{
+        void onFragmentInteraction(List<String> idList);
     }
 }

@@ -24,14 +24,14 @@ public class UtilsRestaurant {
         String address = "";
         for (AddressComponent addressComponent : addressComponents) {
             if (addressComponent.getTypes().get(0).contains("street_number"))
-                address += addressComponent.getName();
+                address += (addressComponent.getName() + " ");
             if (addressComponent.getTypes().get(0).contains("route"))
                 address += addressComponent.getName();
         }
         if (address.isEmpty() && formattedAddress == null)
             address = "No place's address found";
         else if (address.isEmpty())
-            address = formattedAddress;
+            address = formattedAddress.substring(0,formattedAddress.indexOf(","));
         return address;
     }
 
