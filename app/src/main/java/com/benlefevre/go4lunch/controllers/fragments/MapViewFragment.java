@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 
 import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
+import com.benlefevre.go4lunch.api.RestaurantHelper;
+import com.benlefevre.go4lunch.utils.UtilsRestaurant;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,10 +34,13 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.benlefevre.go4lunch.utils.Constants.DEFAULT_LOCATION;
@@ -55,6 +60,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mGoogleMap;
     private PlacesClient mPlacesClient;
 
+    private List<String> mIdList;
+
     public MapViewFragment() {
         // Required empty public constructor
     }
@@ -71,10 +78,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
+        mIdList = new ArrayList<>();
         initMapAndPlaces();
 
     }
-
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
@@ -147,8 +154,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 //                        Verifies if the place's type corresponding to restaurants.
                     if (placeLikelihood.getPlace().getTypes() != null &&
                             (placeLikelihood.getPlace().getTypes().contains(Place.Type.RESTAURANT)
-                            || placeLikelihood.getPlace().getTypes().contains(Place.Type.BAR) ||
-                            placeLikelihood.getPlace().getTypes().contains(Place.Type.MEAL_TAKEAWAY))) {
+                                    || placeLikelihood.getPlace().getTypes().contains(Place.Type.BAR) ||
+                                    placeLikelihood.getPlace().getTypes().contains(Place.Type.MEAL_TAKEAWAY))) {
 //                            Request details for each place corresponding to wanted types.
                         fetchDetailsAboutRestaurants(placeLikelihood.getPlace().getId());
                     }
@@ -175,6 +182,34 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             if (task.isSuccessful() && task.getResult() != null) {
                 Place place = (task.getResult()).getPlace();
                 addMarkerOnMap(place);
+                mIdList.add(placeId);
+                saveRestaurantInFirestore(placeId,place);
+
+            }
+        });
+    }
+
+    /**
+     * Saves a restaurant in a Firestore's Document if it doesn't already exist.
+     * @param placeId the place's id we want save in Firestore.
+     * @param place the place containing details returned by GoogleMaps server.
+     */
+    private void saveRestaurantInFirestore(String placeId, Place place) {
+        String webUrl,address;
+        double rating;
+        List<HashMap<String,String>> hours;
+        webUrl = (place.getWebsiteUri() != null)?place.getWebsiteUri().toString():null;
+        address = UtilsRestaurant.formatAddress(place.getAddress(),place.getAddressComponents().asList());
+        hours = UtilsRestaurant.getOpeningHours(place.getOpeningHours());
+        rating = (place.getRating() != null)?place.getRating() : 0.0;
+
+        RestaurantHelper.getRestaurant(placeId).addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                if (!documentSnapshot.exists()) {
+                    RestaurantHelper.createRestaurant(placeId,place.getName(), webUrl, place.getPhoneNumber());
+                    RestaurantHelper.updateRestaurantInformations(placeId, place.getLatLng(), address, rating, hours);
+                }
             }
         });
     }
