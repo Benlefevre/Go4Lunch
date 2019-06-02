@@ -19,7 +19,7 @@ public class Constants {
     public static final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     public static final String PERMISSION_GRANTED = "permission";
 
-    public static final LatLng DEFAULT_LOCATION = new LatLng(48.852686,2.337957);
+    public static final LatLng DEFAULT_LOCATION = new LatLng(48.852686, 2.337957);
 
     public static final String ORIGIN = "origin";
     public static final String ID_LIST = "idList";
@@ -31,4 +31,8 @@ public class Constants {
     public static final String USER_LONG = "userLong";
 
     public static final String RESTAURANT_NAME = "restaurantName";
+
+    public static final String CHOSEN_RESTAURANT_NAME = "chosenRestaurantName";
+    public static final String CHOSEN_RESTAURANT_ADDRESS = "chosenRestaurantAddres";
+    public static final String CHOSEN_RESTAURANT_ID = "chosenRestaurantId";
 }

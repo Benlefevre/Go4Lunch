@@ -107,7 +107,7 @@ public class UtilsRestaurant {
                 return context.getString(R.string.closing_soon);
             else {
                 if (Locale.getDefault().getLanguage().equals("en")) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a",Locale.getDefault());
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
                     return context.getString(R.string.open_until) + " " + simpleDateFormat.format(close.getTime());
                 } else
                     return context.getString(R.string.open_until) + " " + closeHour;

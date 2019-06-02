@@ -14,7 +14,7 @@ public class Restaurant {
     private LatLng location;
     private String address;
     private double rating;
-    private List<HashMap<String,String>> openingHours;
+    private List<HashMap<String, String>> openingHours;
 
     public Restaurant() {
     }
@@ -31,62 +31,62 @@ public class Restaurant {
         return name;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public LatLng getLocation() {
-        return location;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public List<HashMap<String, String>> getOpeningHours() {
-        return openingHours;
-    }
-
-    //    ------------------------------------ Setters -------------------------------------------------
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUid() {
+        return uid;
     }
 
     public void setUid(String uid) {
         this.uid = uid;
     }
 
+    public String getMail() {
+        return mail;
+    }
+
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setLocation(HashMap<String,Object> map) {
-        this.location = new LatLng((double)map.get("latitude"),(double)map.get("longitude"));
+    //    ------------------------------------ Setters -------------------------------------------------
+
+    public LatLng getLocation() {
+        return location;
+    }
+
+    public void setLocation(HashMap<String, Object> map) {
+        this.location = new LatLng((double) map.get("latitude"), (double) map.get("longitude"));
+    }
+
+    public String getAddress() {
+        return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
     }
 
+    public double getRating() {
+        return rating;
+    }
+
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public List<HashMap<String, String>> getOpeningHours() {
+        return openingHours;
     }
 
     public void setOpeningHours(List<HashMap<String, String>> openingHours) {

@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static com.benlefevre.go4lunch.utils.Constants.DEFAULT_LOCATION;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
@@ -85,7 +86,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
-        mSharedPreferences = mActivity.getSharedPreferences(PREFERENCES,Context.MODE_PRIVATE);
+        mSharedPreferences = Objects.requireNonNull(mActivity).getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         mIdList = new ArrayList<>();
         initMapAndPlaces();
 
@@ -194,7 +195,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             if (task.isSuccessful() && task.getResult() != null) {
                 Place place = (task.getResult()).getPlace();
                 addMarkerOnMap(place);
-                saveRestaurantInFirestore(placeId,place);
+                saveRestaurantInFirestore(placeId, place);
 
             }
         });
@@ -202,23 +203,24 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Saves a restaurant in a Firestore's Document if it doesn't already exist.
+     *
      * @param placeId the place's id we want save in Firestore.
-     * @param place the place containing details returned by GoogleMaps server.
+     * @param place   the place containing details returned by GoogleMaps server.
      */
     private void saveRestaurantInFirestore(String placeId, Place place) {
-        String webUrl,address;
+        String webUrl, address;
         double rating;
-        List<HashMap<String,String>> hours;
-        webUrl = (place.getWebsiteUri() != null)?place.getWebsiteUri().toString():null;
-        address = UtilsRestaurant.formatAddress(place.getAddress(),place.getAddressComponents().asList());
+        List<HashMap<String, String>> hours;
+        webUrl = (place.getWebsiteUri() != null) ? place.getWebsiteUri().toString() : null;
+        address = UtilsRestaurant.formatAddress(place.getAddress(), place.getAddressComponents().asList());
         hours = UtilsRestaurant.getOpeningHours(place.getOpeningHours());
-        rating = (place.getRating() != null)?place.getRating() : 0.0;
+        rating = (place.getRating() != null) ? place.getRating() : 0.0;
 
         RestaurantHelper.getRestaurant(placeId).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 DocumentSnapshot documentSnapshot = task.getResult();
                 if (!documentSnapshot.exists()) {
-                    RestaurantHelper.createRestaurant(placeId,place.getName(), webUrl, place.getPhoneNumber());
+                    RestaurantHelper.createRestaurant(placeId, place.getName(), webUrl, place.getPhoneNumber());
                     RestaurantHelper.updateRestaurantInformations(placeId, place.getLatLng(), address, rating, hours);
                 }
             }
@@ -286,7 +288,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener{
+    public interface OnFragmentInteractionListener {
         void onFragmentInteraction(List<String> idList);
     }
 }

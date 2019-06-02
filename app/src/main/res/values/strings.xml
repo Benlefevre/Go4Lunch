@@ -51,5 +51,13 @@
     <string name="open_until">Open until</string>
     <string name="closed">Closed</string>
     <string name="meters">%1$d m</string>
+    <string name="address">address</string>
+    <string name="name">name</string>
+    <string name="call_icon">call icon</string>
+    <string name="like_star">like star</string>
+    <string name="web_icon">web icon</string>
+    <string name="call">Call</string>
+    <string name="like">Like</string>
+    <string name="website">Website</string>
 
 </resources>

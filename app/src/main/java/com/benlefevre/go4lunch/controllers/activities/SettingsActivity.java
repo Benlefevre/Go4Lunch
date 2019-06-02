@@ -23,7 +23,7 @@ public class SettingsActivity extends BaseActivity {
 
     private void showPreferenceScreen() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.settings_frame_layout,new MySettingsFragment()).commit();
+        fragmentManager.beginTransaction().add(R.id.settings_frame_layout, new MySettingsFragment()).commit();
     }
 
     private void configureToolbar() {
@@ -39,7 +39,7 @@ public class SettingsActivity extends BaseActivity {
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.preferences,rootKey);
+            setPreferencesFromResource(R.xml.preferences, rootKey);
             SettingsActivity settingsActivity = (SettingsActivity) getActivity();
             Preference preference = findPreference("account");
             preference.setOnPreferenceClickListener(preference1 -> {
