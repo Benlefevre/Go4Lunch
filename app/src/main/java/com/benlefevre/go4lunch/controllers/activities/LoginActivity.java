@@ -26,7 +26,6 @@ import static com.benlefevre.go4lunch.utils.Constants.RC_SIGN_IN;
 
 public class LoginActivity extends BaseActivity {
 
-    private static final String TAG = "LoginActivity";
     private SharedPreferences mSharedPreferences;
 
     @Override

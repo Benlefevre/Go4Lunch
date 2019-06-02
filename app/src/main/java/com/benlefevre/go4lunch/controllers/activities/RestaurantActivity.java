@@ -108,7 +108,7 @@ public class RestaurantActivity extends BaseActivity {
                         mRestaurantUid = mRestaurant.getUid();
                         mNameTxt.setText(mRestaurant.getName());
                         mAddressTxt.setText(mRestaurant.getAddress());
-                        mPhoneUri = Uri.parse("tel" + mRestaurant.getPhoneNumber());
+                        mPhoneUri = Uri.parse("tel:" + mRestaurant.getPhoneNumber());
                         if (mRestaurant.getMail() != null)
                             mWebUri = Uri.parse(mRestaurant.getMail());
                         else {

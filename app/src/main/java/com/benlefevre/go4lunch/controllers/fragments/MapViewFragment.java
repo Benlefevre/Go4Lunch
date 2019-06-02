@@ -4,6 +4,7 @@ package com.benlefevre.go4lunch.controllers.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.api.RestaurantHelper;
+import com.benlefevre.go4lunch.controllers.activities.RestaurantActivity;
 import com.benlefevre.go4lunch.utils.UtilsRestaurant;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -48,6 +51,7 @@ import java.util.Objects;
 import static com.benlefevre.go4lunch.utils.Constants.DEFAULT_LOCATION;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.USER_LAT;
 import static com.benlefevre.go4lunch.utils.Constants.USER_LONG;
 
@@ -120,6 +124,12 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mGoogleMap = googleMap;
 //        Sets mGoogleMap's style without poi.
         mGoogleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(mActivity, R.raw.json_style_map));
+//        Sets the realized action when user click on a Marker's InfoWindow
+        mGoogleMap.setOnInfoWindowClickListener(marker -> {
+            Intent intent = new Intent(mActivity, RestaurantActivity.class);
+            intent.putExtra(RESTAURANT_NAME,marker.getTitle());
+            startActivity(intent);
+        });
 //        Request the user's location.
         getLastKnownLocation();
     }

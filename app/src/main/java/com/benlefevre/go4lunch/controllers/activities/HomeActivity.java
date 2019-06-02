@@ -2,6 +2,7 @@ package com.benlefevre.go4lunch.controllers.activities;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -36,11 +38,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.MAP;
 import static com.benlefevre.go4lunch.utils.Constants.MAPVIEW;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSIONS_REQUEST_ACCESS_LOCATION;
+import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_FRAGMENT;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, MapViewFragment.OnFragmentInteractionListener {
@@ -56,8 +61,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     @BindView(R.id.home_activity_drawer)
     DrawerLayout mDrawer;
 
-    private boolean mLocationPermissionGranted = false;
     private FragmentManager mFragmentManager;
+    private SharedPreferences mSharedPreferences;
+
+    private boolean mLocationPermissionGranted = false;
     private List<String> mIdList;
 
     @Override
@@ -65,6 +72,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+        mSharedPreferences = getSharedPreferences(PREFERENCES,MODE_PRIVATE);
         mFragmentManager = getSupportFragmentManager();
         getLocationPermission();
         initUi();
@@ -147,6 +155,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 signOutFromFirebase();
                 break;
             case R.id.drawer_your_lunch:
+                getUserChosenRestaurant();
                 break;
             case R.id.drawer_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -166,6 +175,19 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         }
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Verifies if the user has choose a restaurant and open the RestaurantActivity if he has.
+     */
+    private void getUserChosenRestaurant() {
+        String chosenRestaurant = mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME,null);
+        if(chosenRestaurant != null){
+            Intent intent = new Intent(this,RestaurantActivity.class);
+            intent.putExtra(RESTAURANT_NAME,chosenRestaurant);
+            startActivity(intent);
+        } else
+            Toast.makeText(this,getString(R.string.no_chosen_resto),Toast.LENGTH_SHORT).show();
     }
 
     /**

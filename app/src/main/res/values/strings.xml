@@ -59,5 +59,6 @@
     <string name="call">Call</string>
     <string name="like">Like</string>
     <string name="website">Website</string>
+    <string name="no_chosen_resto">You haven\'t choose a restaurant today</string>
 
 </resources>
