@@ -243,14 +243,14 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                         .commit();
                 break;
             case WORKMATES:
-                RecyclerViewFragment workmateFragent;
+                RecyclerViewFragment workmateFragment;
                 if (mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT) != null)
-                    workmateFragent = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT);
+                    workmateFragment = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT);
                 else
-                    workmateFragent = RecyclerViewFragment.newInstance(WORKMATES,mIdList);
+                    workmateFragment = RecyclerViewFragment.newInstance(WORKMATES,mIdList);
 
-                if (workmateFragent != null)
-                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout,workmateFragent,WORKMATE_FRAGMENT)
+                if (workmateFragment != null)
+                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout,workmateFragment,WORKMATE_FRAGMENT)
                     .commit();
                 break;
         }

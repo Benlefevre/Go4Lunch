@@ -15,6 +15,7 @@ import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.api.RestaurantHelper;
 import com.benlefevre.go4lunch.api.UserHelper;
+import com.benlefevre.go4lunch.controllers.fragments.RecyclerViewFragment;
 import com.benlefevre.go4lunch.models.Restaurant;
 import com.benlefevre.go4lunch.utils.UtilsRestaurant;
 import com.google.android.libraries.places.api.Places;
@@ -37,6 +38,7 @@ import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ADDRESS;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ACTIVITY;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 
 public class RestaurantActivity extends BaseActivity {
@@ -88,6 +90,15 @@ public class RestaurantActivity extends BaseActivity {
         mChoiceDate = new Date();
         initPlaceApi();
         updateUi();
+        initRecyclerView();
+    }
+
+    /**
+     * Initializes the RecyclerView with a FragmentManager's transaction to display a RecyclerViewFragment.
+     */
+    private void initRecyclerView() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.activity_restaurant_frame_layout,
+                RecyclerViewFragment.newInstance(RESTAURANT_ACTIVITY,mRestaurantName)).commit();
     }
 
     /**
@@ -120,7 +131,7 @@ public class RestaurantActivity extends BaseActivity {
                             if (mRestaurant.getRating() != 0.0) {
                                 UtilsRestaurant.updateUiAccordingToRating(mRestaurant.getRating(), mRatingStar, mRatingStar2, mRatingStar3);
                             }
-                            if (mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, "defaultRestaurant").equals(mRestaurantName))
+                            if (Objects.equals(mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, "defaultRestaurant"), mRestaurantName))
                                 mFloatingButton.setImageResource(R.drawable.ic_check_circle_24dp);
                             fetchRestaurantPhoto();
                         }
@@ -136,7 +147,7 @@ public class RestaurantActivity extends BaseActivity {
         List<Place.Field> fields = Collections.singletonList(Place.Field.PHOTO_METADATAS);
         FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(mRestaurantUid, fields).build();
         mClient.fetchPlace(placeRequest).addOnSuccessListener(fetchPlaceResponse -> {
-            if (fetchPlaceResponse.getPlace().getPhotoMetadatas().get(0) != null) {
+            if (Objects.requireNonNull(fetchPlaceResponse.getPlace().getPhotoMetadatas()).get(0) != null) {
                 Place place = fetchPlaceResponse.getPlace();
                 FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(place.getPhotoMetadatas().get(0)).build();
                 mClient.fetchPhoto(photoRequest).addOnSuccessListener(fetchPhotoResponse -> {

@@ -14,7 +14,6 @@ import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.api.UserHelper;
 import com.benlefevre.go4lunch.models.Restaurant;
-import com.benlefevre.go4lunch.models.User;
 import com.benlefevre.go4lunch.utils.Constants;
 import com.benlefevre.go4lunch.utils.UtilsRestaurant;
 import com.google.android.gms.maps.model.LatLng;
@@ -64,10 +63,17 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE);
-        Places.initialize(mContext, BuildConfig.google_maps_key);
-        mClient = Places.createClient(mContext);
+        initPlaceAPI();
         ButterKnife.bind(this, itemView);
         itemView.setTag(this);
+    }
+
+    /**
+     * Initializes the Google Places API.
+     */
+    private void initPlaceAPI() {
+        Places.initialize(mContext, BuildConfig.google_maps_key);
+        mClient = Places.createClient(mContext);
     }
 
     /**
@@ -87,20 +93,18 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
     /**
      * Fetches Users in Firestore when their chosen restaurant's ID equals the item's restaurant's ID.
+     * Binds the request's result size into mNbUsers.
      */
     private void updateNbUsers(String restaurantId) {
         mNbUsers.setVisibility(View.INVISIBLE);
         UserHelper.getUsersCollection().whereEqualTo("restaurantId", restaurantId).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-           if (queryDocumentSnapshots != null){
-               int userCount = 0;
-               for(User user : queryDocumentSnapshots.toObjects(User.class)){
-                   userCount ++;
-                   mNbUsers.setVisibility(View.VISIBLE);
-                   mNbUsers.setText(mContext.getString(R.string.user_number,userCount));
-               }
-           }
-        });
+                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.getDocuments().size() > 0) {
+                        int userCount = queryDocumentSnapshots.getDocuments().size();
+                        mNbUsers.setVisibility(View.VISIBLE);
+                        mNbUsers.setText(mContext.getString(R.string.user_number, userCount));
+                    }
+                });
     }
 
     /**

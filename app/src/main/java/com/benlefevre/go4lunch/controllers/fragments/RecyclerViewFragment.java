@@ -38,6 +38,7 @@ import butterknife.ButterKnife;
 import static com.benlefevre.go4lunch.utils.Constants.ID_LIST;
 import static com.benlefevre.go4lunch.utils.Constants.ORIGIN;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ACTIVITY;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 
@@ -50,6 +51,7 @@ public class RecyclerViewFragment extends Fragment {
     private Activity mActivity;
     private String origin;
     private List<String> mIdList;
+    private String mRestaurantName;
     private List<Restaurant> mRestaurantList;
     private RestaurantAdapter mRestaurantAdapter;
 
@@ -62,6 +64,15 @@ public class RecyclerViewFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ORIGIN, origin);
         args.putStringArrayList(ID_LIST, (ArrayList<String>) idList);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static RecyclerViewFragment newInstance(String origin, String restaurantName) {
+        RecyclerViewFragment fragment = new RecyclerViewFragment();
+        Bundle args = new Bundle();
+        args.putString(ORIGIN, origin);
+        args.putString(RESTAURANT_NAME, restaurantName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -104,27 +115,49 @@ public class RecyclerViewFragment extends Fragment {
                 break;
             case WORKMATES:
                 configureRecyclerViewForWorkmates();
+                break;
+            case RESTAURANT_ACTIVITY:
+                if (getArguments() != null) {
+                    mRestaurantName = getArguments().getString(RESTAURANT_NAME);
+                    configureRecyclerViewForActivityRestaurant();
+                }
+                break;
         }
     }
 
     /**
-     * Sets a FirestoreRecyclerOptions to configure the WorkmatesAdapter to bind all changes into
+     * Sets a FirestoreRecyclerOptions to configure the WorkmateAdapter to bind all changes into
      * the requested collection.
-     * Sets an OnItemClickListener to start RestaurantActivity if condition is true.
      */
-    private void configureRecyclerViewForWorkmates() {
-        Query query = UserHelper.getUsersCollection().orderBy("displayName",Query.Direction.ASCENDING);
+    private void configureRecyclerViewForActivityRestaurant() {
+        Query query = UserHelper.getUsersCollection().whereEqualTo("restaurantName",mRestaurantName);
         FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
                 .setQuery(query,User.class)
                 .setLifecycleOwner(this)
                 .build();
         WorkmateAdapter workmateAdapter = new WorkmateAdapter(options);
         mRecyclerView.setAdapter(workmateAdapter);
+    }
+
+
+    /**
+     * Sets a FirestoreRecyclerOptions to configure the WorkmateAdapter to bind all changes into
+     * the requested collection.
+     * Sets an OnItemClickListener to start RestaurantActivity if condition is true.
+     */
+    private void configureRecyclerViewForWorkmates() {
+        Query query = UserHelper.getUsersCollection().orderBy("displayName", Query.Direction.ASCENDING);
+        FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
+                .setQuery(query, User.class)
+                .setLifecycleOwner(this)
+                .build();
+        WorkmateAdapter workmateAdapter = new WorkmateAdapter(options);
+        mRecyclerView.setAdapter(workmateAdapter);
         workmateAdapter.setOnItemClickListener((documentSnapshot, position) -> {
             User user = documentSnapshot.toObject(User.class);
-            if (user != null && user.getRestaurantName() != null){
-                Intent intent = new Intent(mActivity,RestaurantActivity.class);
-                intent.putExtra(RESTAURANT_NAME,user.getRestaurantName());
+            if (user != null && user.getRestaurantName() != null) {
+                Intent intent = new Intent(mActivity, RestaurantActivity.class);
+                intent.putExtra(RESTAURANT_NAME, user.getRestaurantName());
                 startActivity(intent);
             }
         });
@@ -133,6 +166,7 @@ public class RecyclerViewFragment extends Fragment {
     /**
      * Fetches Restaurants in firestore according the restaurant'id and adds them in a List.
      * Calls configureRecyclerViewForRestaurant when all restaurants are fetched.
+     *
      * @param idList a List of restaurant's id from HomeActivity.
      */
     private void fetchRestaurantInFirestore(List<String> idList) {
@@ -170,7 +204,7 @@ public class RecyclerViewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mRestaurantAdapter != null){
+        if (mRestaurantAdapter != null) {
             mRestaurantAdapter.notifyDataSetChanged();
         }
     }
