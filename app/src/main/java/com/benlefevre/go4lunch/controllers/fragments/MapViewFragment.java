@@ -104,11 +104,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mActivity = getActivity();
         mSharedPreferences = Objects.requireNonNull(mActivity).getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         mIdList = new ArrayList<>();
+        mPlaceList = new ArrayList<>();
         fetchUsersInFirestore();
         initMapAndPlaces();
-
     }
-
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
@@ -198,7 +197,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      */
     @SuppressLint("MissingPermission")
     private void fetchPlacesAroundUser() {
-        mPlaceList = new ArrayList<>();
 //        Defines witch fields we want in the query's response.
         List<Place.Field> fields = Arrays.asList(Place.Field.TYPES, Place.Field.ID);
 //        Creates the request with the defined fields.
@@ -241,9 +239,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             if (task.isSuccessful() && task.getResult() != null) {
                 Place place = (task.getResult()).getPlace();
                 mPlaceList.add(place);
-                addMarkerOnMap();
                 saveRestaurantInFirestore(placeId, place);
             }
+            if (mPlaceList.size() == mIdList.size())
+                addMarkerOnMap();
         });
     }
 
@@ -279,20 +278,24 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private void addMarkerOnMap() {
         if (mPlaceList != null && !mPlaceList.isEmpty()) {
             for (Place place : mPlaceList) {
-                if (place.getLatLng() != null) {
-                    for (User user : mUserList) {
-                        if (user.getRestaurantName() != null && user.getRestaurantName().equals(place.getName())) {
-                            mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
-                                    .icon(BitmapDescriptorFactory.fromBitmap(mBitmapGreen)));
-                        } else {
-                            mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
-                                    .icon(BitmapDescriptorFactory.fromBitmap(mBitmapOrange)));
-                        }
+                int count = 0;
+                for (User user : mUserList) {
+                    if (user.getRestaurantName() != null && user.getRestaurantName().equals(place.getName())) {
+                        count++;
                     }
+                }
+                if (place.getLatLng() != null) {
+                    if (count > 0)
+                        mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng())
+                                .title(place.getName()).icon(BitmapDescriptorFactory.fromBitmap(mBitmapGreen)));
+                    else
+                        mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng())
+                                .title(place.getName()).icon(BitmapDescriptorFactory.fromBitmap(mBitmapOrange)));
                 }
             }
         }
     }
+
 
     /**
      * Creates 2 bitmaps from drawable resources.

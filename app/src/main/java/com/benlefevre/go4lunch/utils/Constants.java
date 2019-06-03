@@ -26,6 +26,7 @@ public class Constants {
 
     public static final String MAPVIEW = "mapView";
     public static final String RESTAURANT_FRAGMENT = "restaurantFragment";
+    public static final String WORKMATE_FRAGMENT = "workmateFragment";
 
     public static final String USER_LAT = "userLat";
     public static final String USER_LONG = "userLong";
@@ -33,6 +34,6 @@ public class Constants {
     public static final String RESTAURANT_NAME = "restaurantName";
 
     public static final String CHOSEN_RESTAURANT_NAME = "chosenRestaurantName";
-    public static final String CHOSEN_RESTAURANT_ADDRESS = "chosenRestaurantAddres";
+    public static final String CHOSEN_RESTAURANT_ADDRESS = "chosenRestaurantAddress";
     public static final String CHOSEN_RESTAURANT_ID = "chosenRestaurantId";
 }

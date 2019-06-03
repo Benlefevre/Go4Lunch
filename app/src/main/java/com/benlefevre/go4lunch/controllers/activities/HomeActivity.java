@@ -51,6 +51,7 @@ import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_FRAGMENT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
+import static com.benlefevre.go4lunch.utils.Constants.WORKMATE_FRAGMENT;
 
 public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener, MapViewFragment.OnFragmentInteractionListener {
 
@@ -226,20 +227,31 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 else
                     mapViewFragment = (MapViewFragment) MapViewFragment.newInstance(mLocationPermissionGranted);
 
-                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment, MAPVIEW)
+                if (mapViewFragment != null)
+                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment, MAPVIEW)
                         .commit();
                 break;
             case RESTAURANT:
-                RecyclerViewFragment recyclerViewFragment;
+                RecyclerViewFragment restaurantFragment;
                 if (mFragmentManager.findFragmentByTag(RESTAURANT_FRAGMENT) != null)
-                    recyclerViewFragment = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(RESTAURANT_FRAGMENT);
+                    restaurantFragment = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(RESTAURANT_FRAGMENT);
                 else
-                    recyclerViewFragment = RecyclerViewFragment.newInstance(RESTAURANT, mIdList);
+                    restaurantFragment = RecyclerViewFragment.newInstance(RESTAURANT, mIdList);
 
-                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, recyclerViewFragment, RESTAURANT_FRAGMENT)
+                if (restaurantFragment != null)
+                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, restaurantFragment, RESTAURANT_FRAGMENT)
                         .commit();
                 break;
             case WORKMATES:
+                RecyclerViewFragment workmateFragent;
+                if (mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT) != null)
+                    workmateFragent = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT);
+                else
+                    workmateFragent = RecyclerViewFragment.newInstance(WORKMATES,mIdList);
+
+                if (workmateFragent != null)
+                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout,workmateFragent,WORKMATE_FRAGMENT)
+                    .commit();
                 break;
         }
     }
@@ -293,7 +305,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      */
     private void showFirstFragment() {
         mFragmentManager.beginTransaction()
-                .add(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), MAPVIEW)
+                .replace(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), MAPVIEW)
                 .commit();
     }
 

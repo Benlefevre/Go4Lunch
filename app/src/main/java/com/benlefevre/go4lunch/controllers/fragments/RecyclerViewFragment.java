@@ -16,15 +16,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.adapters.RestaurantAdapter;
+import com.benlefevre.go4lunch.adapters.WorkmateAdapter;
 import com.benlefevre.go4lunch.api.RestaurantHelper;
+import com.benlefevre.go4lunch.api.UserHelper;
 import com.benlefevre.go4lunch.controllers.activities.RestaurantActivity;
 import com.benlefevre.go4lunch.models.Restaurant;
+import com.benlefevre.go4lunch.models.User;
 import com.benlefevre.go4lunch.views.RestaurantViewHolder;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,10 +39,8 @@ import static com.benlefevre.go4lunch.utils.Constants.ID_LIST;
 import static com.benlefevre.go4lunch.utils.Constants.ORIGIN;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
+import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class RecyclerViewFragment extends Fragment {
 
 
@@ -95,15 +99,40 @@ public class RecyclerViewFragment extends Fragment {
             case RESTAURANT:
                 if (getArguments() != null) {
                     mIdList = getArguments().getStringArrayList(ID_LIST);
-                    fetchRestaurantInFirestore(mIdList);
+                    fetchRestaurantInFirestore(Objects.requireNonNull(mIdList));
                 }
                 break;
+            case WORKMATES:
+                configureRecyclerViewForWorkmates();
         }
     }
 
     /**
+     * Sets a FirestoreRecyclerOptions to configure the WorkmatesAdapter to bind all changes into
+     * the requested collection.
+     * Sets an OnItemClickListener to start RestaurantActivity if condition is true.
+     */
+    private void configureRecyclerViewForWorkmates() {
+        Query query = UserHelper.getUsersCollection().orderBy("displayName",Query.Direction.ASCENDING);
+        FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
+                .setQuery(query,User.class)
+                .setLifecycleOwner(this)
+                .build();
+        WorkmateAdapter workmateAdapter = new WorkmateAdapter(options);
+        mRecyclerView.setAdapter(workmateAdapter);
+        workmateAdapter.setOnItemClickListener((documentSnapshot, position) -> {
+            User user = documentSnapshot.toObject(User.class);
+            if (user != null && user.getRestaurantName() != null){
+                Intent intent = new Intent(mActivity,RestaurantActivity.class);
+                intent.putExtra(RESTAURANT_NAME,user.getRestaurantName());
+                startActivity(intent);
+            }
+        });
+    }
+
+    /**
      * Fetches Restaurants in firestore according the restaurant'id and adds them in a List.
-     *
+     * Calls configureRecyclerViewForRestaurant when all restaurants are fetched.
      * @param idList a List of restaurant's id from HomeActivity.
      */
     private void fetchRestaurantInFirestore(List<String> idList) {
@@ -121,7 +150,6 @@ public class RecyclerViewFragment extends Fragment {
             });
         }
     }
-
 
     /**
      * Configures the RecyclerView with a  RestaurantAdapter and sets an ItemClickListener and it's action.

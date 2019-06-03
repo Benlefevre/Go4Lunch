@@ -63,5 +63,9 @@
     <string name="you_like">You have liked %1$s</string>
     <string name="users_icon">Users icon</string>
     <string name="user_number">(%1$d)</string>
+    <string name="a_photo_of_the_user">a photo of the user</string>
+    <string name="chose">%1$s chose %2$s</string>
+    <string name="no_decided">%1$s has not decided yet</string>
+    <string name="default_profil_phot_url">https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png</string>
 
 </resources>

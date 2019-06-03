@@ -90,19 +90,17 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
      */
     private void updateNbUsers(String restaurantId) {
         mNbUsers.setVisibility(View.INVISIBLE);
-        UserHelper.getUsersCollection().whereEqualTo("restaurantId", restaurantId)
-                .addSnapshotListener((queryDocumentSnapshots, e) -> {
-                    if (e != null)
-                        return;
-                    int userCount = 0;
-                    if (queryDocumentSnapshots != null) {
-                        for (User user : queryDocumentSnapshots.toObjects(User.class)) {
-                            userCount++;
-                            mNbUsers.setVisibility(View.VISIBLE);
-                            mNbUsers.setText(mContext.getString(R.string.user_number,userCount));
-                        }
-                    }
-                });
+        UserHelper.getUsersCollection().whereEqualTo("restaurantId", restaurantId).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+           if (queryDocumentSnapshots != null){
+               int userCount = 0;
+               for(User user : queryDocumentSnapshots.toObjects(User.class)){
+                   userCount ++;
+                   mNbUsers.setVisibility(View.VISIBLE);
+                   mNbUsers.setText(mContext.getString(R.string.user_number,userCount));
+               }
+           }
+        });
     }
 
     /**
