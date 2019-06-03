@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
+import com.benlefevre.go4lunch.api.UserHelper;
 import com.benlefevre.go4lunch.models.Restaurant;
+import com.benlefevre.go4lunch.models.User;
 import com.benlefevre.go4lunch.utils.Constants;
 import com.benlefevre.go4lunch.utils.UtilsRestaurant;
 import com.google.android.gms.maps.model.LatLng;
@@ -61,43 +63,67 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
     public RestaurantViewHolder(@NonNull View itemView, Context context) {
         super(itemView);
         mContext = context;
-        mSharedPreferences = mContext.getSharedPreferences(Constants.PREFERENCES,Context.MODE_PRIVATE);
+        mSharedPreferences = mContext.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE);
         Places.initialize(mContext, BuildConfig.google_maps_key);
         mClient = Places.createClient(mContext);
-        ButterKnife.bind(this,itemView);
+        ButterKnife.bind(this, itemView);
         itemView.setTag(this);
     }
 
     /**
      * Updates UI with restaurant's fields value.
+     *
      * @param restaurant The item's restaurant.
      */
-    public void updateUi(Restaurant restaurant){
+    public void updateUi(Restaurant restaurant) {
         mName.setText(restaurant.getName());
         mAddress.setText(restaurant.getAddress());
         updateHours(restaurant);
         getDistance(restaurant);
-        UtilsRestaurant.updateUiAccordingToRating(restaurant.getRating(),mStar1,mStar2,mStar3);
+        UtilsRestaurant.updateUiAccordingToRating(restaurant.getRating(), mStar1, mStar2, mStar3);
+        updateNbUsers(restaurant.getUid());
         fetchRestaurantPhoto(restaurant.getUid());
     }
 
     /**
+     * Fetches Users in Firestore when their chosen restaurant's ID equals the item's restaurant's ID.
+     */
+    private void updateNbUsers(String restaurantId) {
+        mNbUsers.setVisibility(View.INVISIBLE);
+        UserHelper.getUsersCollection().whereEqualTo("restaurantId", restaurantId)
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e != null)
+                        return;
+                    int userCount = 0;
+                    if (queryDocumentSnapshots != null) {
+                        for (User user : queryDocumentSnapshots.toObjects(User.class)) {
+                            userCount++;
+                            mNbUsers.setVisibility(View.VISIBLE);
+                            mNbUsers.setText(mContext.getString(R.string.user_number,userCount));
+                        }
+                    }
+                });
+    }
+
+    /**
      * Updates mDistance with the distance between user's location and restaurant's location.
+     *
      * @param restaurant The item's restaurant.
      */
-    private void getDistance(Restaurant restaurant){
-        LatLng userPosition = new LatLng(mSharedPreferences.getFloat(USER_LAT, (float) DEFAULT_LOCATION.latitude),mSharedPreferences.getFloat(USER_LONG, (float) DEFAULT_LOCATION.longitude));
+    private void getDistance(Restaurant restaurant) {
+        LatLng userPosition = new LatLng(mSharedPreferences.getFloat(USER_LAT, (float) DEFAULT_LOCATION.latitude), mSharedPreferences.getFloat(USER_LONG, (float) DEFAULT_LOCATION.longitude));
         LatLng restaurantPosition = restaurant.getLocation();
-        int distanceBetween = (int) SphericalUtil.computeDistanceBetween(userPosition,restaurantPosition);
-        mDistance.setText(mContext.getString(R.string.meters,distanceBetween));
+        int distanceBetween = (int) SphericalUtil.computeDistanceBetween(userPosition, restaurantPosition);
+        mDistance.setText(mContext.getString(R.string.meters, distanceBetween));
     }
 
     /**
      * Updates UI according to the restaurant's opening hours.
+     *
      * @param restaurant the selected restaurant.
      */
     private void updateHours(Restaurant restaurant) {
-        mHours.setText(UtilsRestaurant.displayOpeningHours(restaurant,mContext));
+        mHours.setText(UtilsRestaurant.displayOpeningHours(restaurant, mContext));
         if (mHours.getText().equals(mContext.getString(R.string.closing_soon)))
             mHours.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
         else
@@ -106,21 +132,22 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
     /**
      * Fetches a photo from GoogleMaps server according to the item's restaurant's id
+     *
      * @param restaurantId the needed restaurant's id to fetch Photo-Metadata and after a photo.
      */
-    private void fetchRestaurantPhoto(String restaurantId){
+    private void fetchRestaurantPhoto(String restaurantId) {
         List<Place.Field> fields = Collections.singletonList(Place.Field.PHOTO_METADATAS);
-        FetchPlaceRequest request = FetchPlaceRequest.builder(restaurantId,fields).build();
+        FetchPlaceRequest request = FetchPlaceRequest.builder(restaurantId, fields).build();
         mClient.fetchPlace(request).addOnCompleteListener(task -> {
-            if(task.isSuccessful() && task.getResult() != null){
+            if (task.isSuccessful() && task.getResult() != null) {
                 Place responsePlace = task.getResult().getPlace();
-                if (responsePlace.getPhotoMetadatas() != null){
+                if (responsePlace.getPhotoMetadatas() != null) {
                     FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(responsePlace.getPhotoMetadatas().get(0)).build();
                     mClient.fetchPhoto(photoRequest).addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful() && task1.getResult() != null){
+                        if (task1.isSuccessful() && task1.getResult() != null) {
                             Bitmap bitmap = task1.getResult().getBitmap();
                             mPhoto.setImageBitmap(bitmap);
-                        }else
+                        } else
                             mPhoto.setImageResource(R.drawable.ic_restaurant2_24dp);
                     });
                 }

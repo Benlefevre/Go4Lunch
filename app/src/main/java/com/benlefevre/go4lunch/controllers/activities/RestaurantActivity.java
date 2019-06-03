@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
@@ -105,22 +106,24 @@ public class RestaurantActivity extends BaseActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.getDocuments().get(0) != null) {
                         mRestaurant = queryDocumentSnapshots.getDocuments().get(0).toObject(Restaurant.class);
-                        mRestaurantUid = mRestaurant.getUid();
-                        mNameTxt.setText(mRestaurant.getName());
-                        mAddressTxt.setText(mRestaurant.getAddress());
-                        mPhoneUri = Uri.parse("tel:" + mRestaurant.getPhoneNumber());
-                        if (mRestaurant.getMail() != null)
-                            mWebUri = Uri.parse(mRestaurant.getMail());
-                        else {
-                            mWebImg.setVisibility(View.GONE);
-                            mActivityRestaurantWebTxt.setVisibility(View.GONE);
+                        if (mRestaurant != null) {
+                            mRestaurantUid = mRestaurant.getUid();
+                            mNameTxt.setText(mRestaurant.getName());
+                            mAddressTxt.setText(mRestaurant.getAddress());
+                            mPhoneUri = Uri.parse("tel:" + mRestaurant.getPhoneNumber());
+                            if (mRestaurant.getMail() != null)
+                                mWebUri = Uri.parse(mRestaurant.getMail());
+                            else {
+                                mWebImg.setVisibility(View.GONE);
+                                mActivityRestaurantWebTxt.setVisibility(View.GONE);
+                            }
+                            if (mRestaurant.getRating() != 0.0) {
+                                UtilsRestaurant.updateUiAccordingToRating(mRestaurant.getRating(), mRatingStar, mRatingStar2, mRatingStar3);
+                            }
+                            if (mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, "defaultRestaurant").equals(mRestaurantName))
+                                mFloatingButton.setImageResource(R.drawable.ic_check_circle_24dp);
+                            fetchRestaurantPhoto();
                         }
-                        if (mRestaurant.getRating() != 0.0) {
-                            UtilsRestaurant.updateUiAccordingToRating(mRestaurant.getRating(), mRatingStar, mRatingStar2, mRatingStar3);
-                        }
-                        if (mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, "defaultRestaurant").equals(mRestaurantName))
-                            mFloatingButton.setImageResource(R.drawable.ic_check_circle_24dp);
-                        fetchRestaurantPhoto();
                     }
                 });
     }
@@ -180,6 +183,7 @@ public class RestaurantActivity extends BaseActivity {
                 if (!mSharedPreferences.getBoolean(mRestaurantName, false)) {
                     RestaurantHelper.updateRestaurantLike(mRestaurantUid);
                     mSharedPreferences.edit().putBoolean(mRestaurantName, true).apply();
+                    Toast.makeText(this, getString(R.string.you_like, mRestaurantName), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.activity_restaurant_web_img:

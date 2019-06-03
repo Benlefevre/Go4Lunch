@@ -24,13 +24,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 import com.benlefevre.go4lunch.R;
+import com.benlefevre.go4lunch.api.UserHelper;
 import com.benlefevre.go4lunch.controllers.fragments.MapViewFragment;
 import com.benlefevre.go4lunch.controllers.fragments.RecyclerViewFragment;
+import com.benlefevre.go4lunch.models.User;
+import com.benlefevre.go4lunch.utils.UtilsUser;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,10 +76,28 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
-        mSharedPreferences = getSharedPreferences(PREFERENCES,MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
         mFragmentManager = getSupportFragmentManager();
         getLocationPermission();
         initUi();
+        resetUserRestaurantChoice();
+    }
+
+    /**
+     * Resets users fields if their restaurant's choice's date is before yesterday at 12:00 PM
+     */
+    private void resetUserRestaurantChoice() {
+        UserHelper.getUsersCollection().get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    User user = document.toObject(User.class);
+                    if (user != null && user.getChoiceDate() != null &&
+                            !UtilsUser.compareDate(user.getChoiceDate()))
+                        UserHelper.updateUserChosenRestaurant(user.getUid(), null,
+                                null, null);
+                }
+            }
+        });
     }
 
     /**
@@ -181,13 +203,13 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      * Verifies if the user has choose a restaurant and open the RestaurantActivity if he has.
      */
     private void getUserChosenRestaurant() {
-        String chosenRestaurant = mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME,null);
-        if(chosenRestaurant != null){
-            Intent intent = new Intent(this,RestaurantActivity.class);
-            intent.putExtra(RESTAURANT_NAME,chosenRestaurant);
+        String chosenRestaurant = mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, null);
+        if (chosenRestaurant != null) {
+            Intent intent = new Intent(this, RestaurantActivity.class);
+            intent.putExtra(RESTAURANT_NAME, chosenRestaurant);
             startActivity(intent);
         } else
-            Toast.makeText(this,getString(R.string.no_chosen_resto),Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_chosen_resto), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -204,7 +226,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 else
                     mapViewFragment = (MapViewFragment) MapViewFragment.newInstance(mLocationPermissionGranted);
 
-                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment,MAPVIEW)
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment, MAPVIEW)
                         .commit();
                 break;
             case RESTAURANT:
@@ -214,7 +236,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                 else
                     recyclerViewFragment = RecyclerViewFragment.newInstance(RESTAURANT, mIdList);
 
-                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, recyclerViewFragment,RESTAURANT_FRAGMENT)
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, recyclerViewFragment, RESTAURANT_FRAGMENT)
                         .commit();
                 break;
             case WORKMATES:

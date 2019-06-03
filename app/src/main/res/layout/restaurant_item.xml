@@ -94,13 +94,10 @@
         android:id="@+id/restaurant_item_nb_user_txt"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:visibility="invisible"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:drawableStart="@drawable/ic_person_24dp"
-        app:layout_constraintBottom_toTopOf="@+id/restaurant_item_first_star_img"
+        app:layout_constraintBottom_toBottomOf="@+id/restaurant_item_img_view"
         app:layout_constraintEnd_toStartOf="@+id/restaurant_item_img_view"
-        app:layout_constraintTop_toBottomOf="@+id/restaurant_item_distance_txt_view" />
+        app:layout_constraintTop_toTopOf="@+id/restaurant_item_img_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

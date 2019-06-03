@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +20,9 @@ import androidx.fragment.app.Fragment;
 import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.api.RestaurantHelper;
+import com.benlefevre.go4lunch.api.UserHelper;
 import com.benlefevre.go4lunch.controllers.activities.RestaurantActivity;
+import com.benlefevre.go4lunch.models.User;
 import com.benlefevre.go4lunch.utils.UtilsRestaurant;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,9 +30,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -39,6 +42,9 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.maps.android.ui.IconGenerator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -68,11 +74,17 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private LatLng mLastKnownLocation;
     private SharedPreferences mSharedPreferences;
 
+    private ListenerRegistration mEventListener;
+
     private MapView mMapView;
     private GoogleMap mGoogleMap;
     private PlacesClient mPlacesClient;
 
     private List<String> mIdList;
+    private Bitmap mBitmapOrange;
+    private Bitmap mBitmapGreen;
+    private List<User> mUserList;
+    private List<Place> mPlaceList;
 
     public MapViewFragment() {
         // Required empty public constructor
@@ -92,9 +104,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mActivity = getActivity();
         mSharedPreferences = Objects.requireNonNull(mActivity).getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         mIdList = new ArrayList<>();
+        fetchUsersInFirestore();
         initMapAndPlaces();
 
     }
+
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
@@ -108,6 +122,27 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
+     * Fetches all users in Firebase ans sets a listener to update mUserList if a user chose a restaurant
+     */
+    private void fetchUsersInFirestore() {
+        UserHelper.getUsersCollection().get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots != null && !queryDocumentSnapshots.getDocuments().isEmpty())
+                mUserList = queryDocumentSnapshots.toObjects(User.class);
+        });
+        Query query = UserHelper.getUsersCollection();
+        mEventListener = query.addSnapshotListener((queryDocumentSnapshots, e) -> {
+            if (e != null)
+                return;
+            if (queryDocumentSnapshots != null && !queryDocumentSnapshots.getDocuments().isEmpty()) {
+                mUserList = new ArrayList<>();
+                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
+                    mUserList.add(documentSnapshot.toObject(User.class));
+                }
+            }
+        });
+    }
+
+    /**
      * Initializes needed fields to use GoogleMap and Places APIS.
      */
     private void initMapAndPlaces() {
@@ -117,6 +152,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mActivity);
         Places.initialize(mActivity, BuildConfig.google_maps_key);
         mPlacesClient = Places.createClient(mActivity);
+        generateBitmapToMarkers();
     }
 
     @Override
@@ -127,10 +163,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 //        Sets the realized action when user click on a Marker's InfoWindow
         mGoogleMap.setOnInfoWindowClickListener(marker -> {
             Intent intent = new Intent(mActivity, RestaurantActivity.class);
-            intent.putExtra(RESTAURANT_NAME,marker.getTitle());
+            intent.putExtra(RESTAURANT_NAME, marker.getTitle());
             startActivity(intent);
         });
-//        Request the user's location.
+//        Request the user's location to GooglePlay services.
         getLastKnownLocation();
     }
 
@@ -148,7 +184,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         mSharedPreferences.edit().putFloat(USER_LONG, (float) mLastKnownLocation.longitude).apply();
                         mGoogleMap.setMyLocationEnabled(true);
                         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 18));
-
                     }
                 });
             }
@@ -163,6 +198,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      */
     @SuppressLint("MissingPermission")
     private void fetchPlacesAroundUser() {
+        mPlaceList = new ArrayList<>();
 //        Defines witch fields we want in the query's response.
         List<Place.Field> fields = Arrays.asList(Place.Field.TYPES, Place.Field.ID);
 //        Creates the request with the defined fields.
@@ -204,9 +240,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mPlacesClient.fetchPlace(placeRequest).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 Place place = (task.getResult()).getPlace();
-                addMarkerOnMap(place);
+                mPlaceList.add(place);
+                addMarkerOnMap();
                 saveRestaurantInFirestore(placeId, place);
-
             }
         });
     }
@@ -239,12 +275,34 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Adds a marker on map according to the place's location and the place's name.
-     *
-     * @param place The place for witch to add a marker.
      */
-    private void addMarkerOnMap(Place place) {
-        if (place.getLatLng() != null)
-            mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
+    private void addMarkerOnMap() {
+        if (mPlaceList != null && !mPlaceList.isEmpty()) {
+            for (Place place : mPlaceList) {
+                if (place.getLatLng() != null) {
+                    for (User user : mUserList) {
+                        if (user.getRestaurantName() != null && user.getRestaurantName().equals(place.getName())) {
+                            mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
+                                    .icon(BitmapDescriptorFactory.fromBitmap(mBitmapGreen)));
+                        } else {
+                            mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
+                                    .icon(BitmapDescriptorFactory.fromBitmap(mBitmapOrange)));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates 2 bitmaps from drawable resources.
+     */
+    private void generateBitmapToMarkers() {
+        IconGenerator iconGenerator = new IconGenerator(mActivity);
+        iconGenerator.setBackground(getResources().getDrawable(R.drawable.house_location_marker_orange));
+        mBitmapOrange = iconGenerator.makeIcon();
+        iconGenerator.setBackground(getResources().getDrawable(R.drawable.house_location_green_marker));
+        mBitmapGreen = iconGenerator.makeIcon();
     }
 
     @Override
@@ -266,12 +324,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        addMarkerOnMap();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
+        mGoogleMap.clear();
     }
 
     @Override
@@ -296,6 +356,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mEventListener.remove();
     }
 
     public interface OnFragmentInteractionListener {

@@ -47,6 +47,7 @@ public class RecyclerViewFragment extends Fragment {
     private String origin;
     private List<String> mIdList;
     private List<Restaurant> mRestaurantList;
+    private RestaurantAdapter mRestaurantAdapter;
 
     public RecyclerViewFragment() {
         // Required empty public constructor
@@ -126,16 +127,23 @@ public class RecyclerViewFragment extends Fragment {
      * Configures the RecyclerView with a  RestaurantAdapter and sets an ItemClickListener and it's action.
      */
     private void configureRecyclerViewForRestaurants() {
-        RestaurantAdapter restaurantAdapter = new RestaurantAdapter(mRestaurantList);
-        restaurantAdapter.setOnItemClickListener(v -> {
+        mRestaurantAdapter = new RestaurantAdapter(mRestaurantList);
+        mRestaurantAdapter.setOnItemClickListener(v -> {
             RestaurantViewHolder holder = (RestaurantViewHolder) v.getTag();
             int position = holder.getAdapterPosition();
             Intent intent = new Intent(mActivity, RestaurantActivity.class);
             intent.putExtra(RESTAURANT_NAME, mRestaurantList.get(position).getName());
             startActivity(intent);
         });
-        mRecyclerView.setAdapter(restaurantAdapter);
-        restaurantAdapter.notifyDataSetChanged();
+        mRecyclerView.setAdapter(mRestaurantAdapter);
+        mRestaurantAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mRestaurantAdapter != null){
+            mRestaurantAdapter.notifyDataSetChanged();
+        }
+    }
 }

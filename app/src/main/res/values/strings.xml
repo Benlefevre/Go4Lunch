@@ -60,5 +60,8 @@
     <string name="like">Like</string>
     <string name="website">Website</string>
     <string name="no_chosen_resto">You haven\'t choose a restaurant today</string>
+    <string name="you_like">You have liked %1$s</string>
+    <string name="users_icon">Users icon</string>
+    <string name="user_number">(%1$d)</string>
 
 </resources>
