@@ -59,12 +59,14 @@ public class RestaurantActivity extends BaseActivity {
     FloatingActionButton mFloatingButton;
     @BindView(R.id.activity_restaurant_call_img)
     ImageView mCallImg;
+    @BindView(R.id.activity_restaurant_call_txt)
+    TextView mCallTxt;
     @BindView(R.id.activity_restaurant_like_img)
     ImageView mLikeImg;
     @BindView(R.id.activity_restaurant_web_img)
     ImageView mWebImg;
     @BindView(R.id.activity_restaurant_web_txt)
-    TextView mActivityRestaurantWebTxt;
+    TextView mWebTxt;
     @BindView(R.id.activity_restaurant_frame_layout)
     FrameLayout mFrameLayout;
 
@@ -98,7 +100,7 @@ public class RestaurantActivity extends BaseActivity {
      */
     private void initRecyclerView() {
         getSupportFragmentManager().beginTransaction().replace(R.id.activity_restaurant_frame_layout,
-                RecyclerViewFragment.newInstance(RESTAURANT_ACTIVITY,mRestaurantName)).commit();
+                RecyclerViewFragment.newInstance(RESTAURANT_ACTIVITY, mRestaurantName)).commit();
     }
 
     /**
@@ -121,12 +123,17 @@ public class RestaurantActivity extends BaseActivity {
                             mRestaurantUid = mRestaurant.getUid();
                             mNameTxt.setText(mRestaurant.getName());
                             mAddressTxt.setText(mRestaurant.getAddress());
-                            mPhoneUri = Uri.parse("tel:" + mRestaurant.getPhoneNumber());
+                            if (mRestaurant.getPhoneNumber() != null)
+                                mPhoneUri = Uri.parse("tel:" + mRestaurant.getPhoneNumber());
+                            else{
+                                mCallImg.setVisibility(View.INVISIBLE);
+                                mCallTxt.setVisibility(View.INVISIBLE);
+                            }
                             if (mRestaurant.getMail() != null)
                                 mWebUri = Uri.parse(mRestaurant.getMail());
                             else {
                                 mWebImg.setVisibility(View.GONE);
-                                mActivityRestaurantWebTxt.setVisibility(View.GONE);
+                                mWebTxt.setVisibility(View.GONE);
                             }
                             if (mRestaurant.getRating() != 0.0) {
                                 UtilsRestaurant.updateUiAccordingToRating(mRestaurant.getRating(), mRatingStar, mRatingStar2, mRatingStar3);
@@ -197,7 +204,7 @@ public class RestaurantActivity extends BaseActivity {
                     mSharedPreferences.edit().putBoolean(mRestaurantName, true).apply();
                     Toast.makeText(this, getString(R.string.you_like, mRestaurantName), Toast.LENGTH_SHORT).show();
                 } else
-                    Toast.makeText(this,getString(R.string.already_like,mRestaurantName),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.already_like, mRestaurantName), Toast.LENGTH_SHORT).show();
                 break;
             case R.id.activity_restaurant_web_img:
                 if (mWebUri != null)

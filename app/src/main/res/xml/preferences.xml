@@ -5,7 +5,7 @@
         android:title="@string/notifications">
 
         <SwitchPreference
-            android:key="notification"
+            android:key="@string/notif_pref"
             android:title="@string/enable_notif"
             android:summary="@string/notif_summary"
             android:defaultValue="true"/>

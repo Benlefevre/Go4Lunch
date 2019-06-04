@@ -72,5 +72,12 @@
     <string name="here_to_delete">Click here if you want delete your Go4Lunch account</string>
     <string name="already_like">You\'ve already like %1$s</string>
     <string name="you">You</string>
+    <string name="notif_pref">notification</string>
+    <string name="you_notif">You,</string>
+    <string name="time_lunch">It\'s time to lunch</string>
+    <string name="lunch_at">Don\'t forget, you chose to lunch at %1$s</string>
+    <string name="is_located">%1$s is located at :</string>
+    <string name="you_lunch_with">You can lunch with :</string>
+    <string name="recall">Just a little recall</string>
 
 </resources>

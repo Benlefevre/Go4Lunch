@@ -74,8 +74,8 @@ public class UserHelper {
     /**
      * Updates field in Firestore
      * @param uid the User's uid that we want update field
-     * @param token the FirebaseMessaging token generate at the application's start or when user realizes
-     * operations like logIn/logOut , deleteAccount and logIn with new account.
+     * @param token the FirebaseMessaging token generate at the application's start or
+     * when user realizes operations as logIn/logOut , deleteAccount and logIn with new account.
      */
     public static Task<Void> updateUserMessagingToken(String uid,String token){
         return getUsersCollection().document(uid).update("messToken",token);
