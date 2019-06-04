@@ -190,7 +190,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         mGoogleMap.setMyLocationEnabled(true);
                         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 18));
                         LatLngBounds bound = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
-                        Log.i("info", "getLastKnownLocation: " + bound.northeast + "/" + bound.southwest);
                         mSharedPreferences.edit().putFloat(USER_LAT, (float) mLastKnownLocation.latitude).apply();
                         mSharedPreferences.edit().putFloat(USER_LONG, (float) mLastKnownLocation.longitude).apply();
                         mSharedPreferences.edit().putFloat(LAT_NORTH, (float) bound.northeast.latitude).apply();

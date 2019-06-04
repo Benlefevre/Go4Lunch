@@ -59,6 +59,8 @@ import static com.benlefevre.go4lunch.utils.Constants.LONG_NORTH;
 import static com.benlefevre.go4lunch.utils.Constants.LONG_SOUTH;
 import static com.benlefevre.go4lunch.utils.Constants.MAP;
 import static com.benlefevre.go4lunch.utils.Constants.MAPVIEW;
+import static com.benlefevre.go4lunch.utils.Constants.MESS_TOKEN;
+import static com.benlefevre.go4lunch.utils.Constants.MESS_TOKEN_CHANGED;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSIONS_REQUEST_ACCESS_LOCATION;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
@@ -95,9 +97,21 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         ButterKnife.bind(this);
         mSharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
         mFragmentManager = getSupportFragmentManager();
+        updateMessagingTokenIfItChanges();
         getLocationPermission();
         initUi();
         resetUserRestaurantChoice();
+    }
+
+    /**
+     * Verifies if the user's messenging token has changed and if it is sends the new token in Firestore.
+     */
+    private void updateMessagingTokenIfItChanges(){
+        if (mSharedPreferences.getBoolean(MESS_TOKEN_CHANGED,false)){
+            String token = mSharedPreferences.getString(MESS_TOKEN,"");
+            UserHelper.updateUserMessagingToken(getCurrentUser().getUid(),token);
+            mSharedPreferences.edit().putBoolean(MESS_TOKEN_CHANGED,false).apply();
+        }
     }
 
     /**

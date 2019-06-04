@@ -14,6 +14,8 @@ public class Constants {
     public static final String PROVIDER = "provider";
     public static final String IDP_TOKEN = "idpToken";
     public static final String IDP_SECRET = "idpSecret";
+    public static final String MESS_TOKEN = "messagingToken";
+    public static final String MESS_TOKEN_CHANGED = "massagingTokenChanged";
 
     public static final String RESTAURANT = "restaurant";
     public static final String MAP = "map";

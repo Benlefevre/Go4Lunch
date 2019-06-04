@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -108,10 +107,10 @@ public class RecyclerViewFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         switch (origin) {
             case RESTAURANT:
-                if (getArguments() != null) {
+                if (getArguments() != null)
                     mIdList = getArguments().getStringArrayList(ID_LIST);
-                    fetchRestaurantInFirestore(Objects.requireNonNull(mIdList));
-                }
+                if (mIdList != null)
+                    fetchRestaurantInFirestore(mIdList);
                 break;
             case WORKMATES:
                 configureRecyclerViewForWorkmates();
