@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,18 +32,31 @@ import com.benlefevre.go4lunch.models.User;
 import com.benlefevre.go4lunch.utils.UtilsUser;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.benlefevre.go4lunch.utils.Constants.AUTOCOMPLETE_REQUEST;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
+import static com.benlefevre.go4lunch.utils.Constants.LAT_NORTH;
+import static com.benlefevre.go4lunch.utils.Constants.LAT_SOUTH;
+import static com.benlefevre.go4lunch.utils.Constants.LONG_NORTH;
+import static com.benlefevre.go4lunch.utils.Constants.LONG_SOUTH;
 import static com.benlefevre.go4lunch.utils.Constants.MAP;
 import static com.benlefevre.go4lunch.utils.Constants.MAPVIEW;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSIONS_REQUEST_ACCESS_LOCATION;
@@ -50,6 +64,7 @@ import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_FRAGMENT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
+import static com.benlefevre.go4lunch.utils.Constants.USER_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATE_FRAGMENT;
 
@@ -71,6 +86,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
     private boolean mLocationPermissionGranted = false;
     private List<String> mIdList;
+    private int displayedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +98,59 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         getLocationPermission();
         initUi();
         resetUserRestaurantChoice();
+    }
+
+    /**
+     * Sets an Autocomplete.IntentBuilder with constrains to fetch an Autocomplete widget.
+     *
+     * @param item The clicked item
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        LatLng north = new LatLng(mSharedPreferences.getFloat(LAT_NORTH, (float) 48.834164806748554),
+                mSharedPreferences.getFloat(LONG_NORTH, (float) 2.387833558022976));
+        LatLng south = new LatLng(mSharedPreferences.getFloat(LAT_SOUTH, (float) 48.8322317248286),
+                mSharedPreferences.getFloat(LONG_SOUTH, (float) 2.3856264352798457));
+        if (item.getItemId() == R.id.toolbar_search) {
+            List<Place.Field> fields = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID);
+            Intent intent = new Autocomplete.IntentBuilder(
+                    AutocompleteActivityMode.OVERLAY, fields)
+                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                    .setCountry("fr")
+                    .setLocationRestriction(RectangularBounds.newInstance(south, north))
+                    .build(this);
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Overrides onActivityResult to handle UI with the user's Autocomplete Prediction choice.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTOCOMPLETE_REQUEST && resultCode == RESULT_OK) {
+            Place place = Autocomplete.getPlaceFromIntent(data);
+            for (String restaurantId : mIdList) {
+                if (restaurantId.equals(place.getId())) {
+                    switch (displayedFragment) {
+                        case 1:
+                            MapViewFragment mapViewFragment = (MapViewFragment) mFragmentManager.findFragmentByTag(MAPVIEW);
+                            if (mapViewFragment != null)
+                                mapViewFragment.moveCameraToSelectedRestaurant(place.getLatLng());
+                            break;
+                        case 2:
+                            RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(RESTAURANT_FRAGMENT);
+                            if (recyclerViewFragment != null)
+                                recyclerViewFragment.showSelectedRestaurant(place.getId());
+                            break;
+                    }
+                }
+            }
+        } else if (requestCode == AUTOCOMPLETE_REQUEST && resultCode == AutocompleteActivity.RESULT_ERROR)
+            Log.e("error", Autocomplete.getStatusFromIntent(data).getStatusMessage());
     }
 
     /**
@@ -131,8 +200,10 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
             Glide.with(this).load(currentUser.getPhotoUrl()).apply(RequestOptions.circleCropTransform()).into(userPhoto);
         else
             userPhoto.setImageResource(R.drawable.ic_person_24dp);
-        if (currentUser.getDisplayName() != null)
+        if (currentUser.getDisplayName() != null) {
             userName.setText(currentUser.getDisplayName());
+            mSharedPreferences.edit().putString(USER_NAME, currentUser.getDisplayName()).apply();
+        }
         if (currentUser.getEmail() != null)
             userMail.setText(currentUser.getEmail());
     }
@@ -186,14 +257,17 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.bottom_map:
                 mToolbar.setTitle(R.string.hungry);
                 displayFragmentAccordingToItemSelected(MAP);
+                displayedFragment = 1;
                 break;
             case R.id.bottom_restaurant:
                 mToolbar.setTitle(R.string.hungry);
                 displayFragmentAccordingToItemSelected(RESTAURANT);
+                displayedFragment = 2;
                 break;
             case R.id.bottom_workmates:
                 mToolbar.setTitle(R.string.available_workmates);
                 displayFragmentAccordingToItemSelected(WORKMATES);
+                displayedFragment = 3;
                 break;
         }
         mDrawer.closeDrawer(GravityCompat.START);
@@ -229,7 +303,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
                 if (mapViewFragment != null)
                     mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, mapViewFragment, MAPVIEW)
-                        .commit();
+                            .commit();
                 break;
             case RESTAURANT:
                 RecyclerViewFragment restaurantFragment;
@@ -240,18 +314,18 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
                 if (restaurantFragment != null)
                     mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, restaurantFragment, RESTAURANT_FRAGMENT)
-                        .commit();
+                            .commit();
                 break;
             case WORKMATES:
                 RecyclerViewFragment workmateFragment;
                 if (mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT) != null)
                     workmateFragment = (RecyclerViewFragment) mFragmentManager.findFragmentByTag(WORKMATE_FRAGMENT);
                 else
-                    workmateFragment = RecyclerViewFragment.newInstance(WORKMATES,mIdList);
+                    workmateFragment = RecyclerViewFragment.newInstance(WORKMATES, mIdList);
 
                 if (workmateFragment != null)
-                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout,workmateFragment,WORKMATE_FRAGMENT)
-                    .commit();
+                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, workmateFragment, WORKMATE_FRAGMENT)
+                            .commit();
                 break;
         }
     }
@@ -287,6 +361,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -307,6 +382,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         mFragmentManager.beginTransaction()
                 .replace(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), MAPVIEW)
                 .commit();
+        displayedFragment = 1;
     }
 
     /**

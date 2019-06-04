@@ -7,6 +7,9 @@ public class Constants {
     public static final String PREFERENCES = "sharedPreferences";
     public static final int RC_SIGN_IN = 123;
     public static final int SIGN_OUT_TASK = 123;
+    public static final int AUTOCOMPLETE_REQUEST = 456;
+
+    public static final String USER_NAME = "userName";
 
     public static final String PROVIDER = "provider";
     public static final String IDP_TOKEN = "idpToken";
@@ -31,6 +34,10 @@ public class Constants {
 
     public static final String USER_LAT = "userLat";
     public static final String USER_LONG = "userLong";
+    public static final String LAT_NORTH = "latNorth";
+    public static final String LONG_NORTH = "longNorth";
+    public static final String LAT_SOUTH = "latSouth";
+    public static final String LONG_SOUTH = "longSouth";
 
     public static final String RESTAURANT_NAME = "restaurantName";
 

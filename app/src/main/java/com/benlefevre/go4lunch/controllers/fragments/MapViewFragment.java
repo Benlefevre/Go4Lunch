@@ -32,6 +32,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
@@ -55,15 +56,16 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.benlefevre.go4lunch.utils.Constants.DEFAULT_LOCATION;
+import static com.benlefevre.go4lunch.utils.Constants.LAT_NORTH;
+import static com.benlefevre.go4lunch.utils.Constants.LAT_SOUTH;
+import static com.benlefevre.go4lunch.utils.Constants.LONG_NORTH;
+import static com.benlefevre.go4lunch.utils.Constants.LONG_SOUTH;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.USER_LAT;
 import static com.benlefevre.go4lunch.utils.Constants.USER_LONG;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     private OnFragmentInteractionListener mListener;
@@ -85,6 +87,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private Bitmap mBitmapGreen;
     private List<User> mUserList;
     private List<Place> mPlaceList;
+
+    public interface OnFragmentInteractionListener {
+        void onFragmentInteraction(List<String> idList);
+    }
 
     public MapViewFragment() {
         // Required empty public constructor
@@ -172,6 +178,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     /**
      * Gets the last known location with google location services and move the GoogleMap's camera to
      * the user's position.
+     * Saves in SharedPreferences the last known user's location and the LatLngBound to constrain
+     * Autocomplete's queries.
      */
     private void getLastKnownLocation() {
         try {
@@ -179,10 +187,16 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
                     if (location != null) {
                         mLastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                        mSharedPreferences.edit().putFloat(USER_LAT, (float) mLastKnownLocation.latitude).apply();
-                        mSharedPreferences.edit().putFloat(USER_LONG, (float) mLastKnownLocation.longitude).apply();
                         mGoogleMap.setMyLocationEnabled(true);
                         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 18));
+                        LatLngBounds bound = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
+                        Log.i("info", "getLastKnownLocation: " + bound.northeast + "/" + bound.southwest);
+                        mSharedPreferences.edit().putFloat(USER_LAT, (float) mLastKnownLocation.latitude).apply();
+                        mSharedPreferences.edit().putFloat(USER_LONG, (float) mLastKnownLocation.longitude).apply();
+                        mSharedPreferences.edit().putFloat(LAT_NORTH, (float) bound.northeast.latitude).apply();
+                        mSharedPreferences.edit().putFloat(LONG_NORTH, (float) bound.northeast.longitude).apply();
+                        mSharedPreferences.edit().putFloat(LAT_SOUTH, (float) bound.southwest.latitude).apply();
+                        mSharedPreferences.edit().putFloat(LONG_SOUTH, (float) bound.southwest.longitude).apply();
                     }
                 });
             }
@@ -217,6 +231,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         fetchDetailsAboutRestaurants(placeLikelihood.getPlace().getId());
                     }
                 }
+//                Sends the mIdList to HomeActivity for create a restaurant list into RestaurantFragment.
                 mListener.onFragmentInteraction(mIdList);
             }
         });
@@ -296,6 +311,15 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Move the map's camera to the selected restaurant's.
+     *
+     * @param latLng the restaurant's location as LatLng.
+     */
+    public void moveCameraToSelectedRestaurant(LatLng latLng) {
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 22));
+    }
+
 
     /**
      * Creates 2 bitmaps from drawable resources.
@@ -360,9 +384,5 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         super.onDetach();
         mListener = null;
         mEventListener.remove();
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(List<String> idList);
     }
 }

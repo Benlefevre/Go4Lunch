@@ -191,11 +191,13 @@ public class RestaurantActivity extends BaseActivity {
                     startActivity(new Intent(Intent.ACTION_DIAL, mPhoneUri));
                 break;
             case R.id.activity_restaurant_like_img:
+//                Saves the like in Firestore's corresponding document and in SharedPreferences.
                 if (!mSharedPreferences.getBoolean(mRestaurantName, false)) {
                     RestaurantHelper.updateRestaurantLike(mRestaurantUid);
                     mSharedPreferences.edit().putBoolean(mRestaurantName, true).apply();
                     Toast.makeText(this, getString(R.string.you_like, mRestaurantName), Toast.LENGTH_SHORT).show();
-                }
+                } else
+                    Toast.makeText(this,getString(R.string.already_like,mRestaurantName),Toast.LENGTH_SHORT).show();
                 break;
             case R.id.activity_restaurant_web_img:
                 if (mWebUri != null)

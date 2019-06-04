@@ -1,0 +1,76 @@
+<resources>
+    <string name="app_name">Go4Lunch</string>
+
+    <string name="facebook_application_id">296011911276762</string>
+    <string name="fb_login_protocol_scheme">fb296011911276762</string>
+
+    <string name="twitter_consumer_key" translatable="false">SZ2vdqtLXeURjnJJCsXpTzp0M</string>
+    <string name="twitter_consumer_secret" translatable="false">mtDEAfWuglWmXzLeumYRWzM8qBhunolhVDZ0g4TQ3FIUrBOpb5</string>
+
+    <string name="auth_failed">L\'identification a échoué, merci de réessayer.</string>
+    <string name="network_access">Un accès réseau is nécessaire pour vous identifier</string>
+    <string name="unknown_error">Il y a une erreur inconnue</string>
+    <string name="your_lunch">VOTRE DEJEUNER</string>
+    <string name="settings">PARAMETRES</string>
+    <string name="logout">SE DECONNECTER</string>
+    <string name="map_view">Carte</string>
+    <string name="restaurant_list">Liste des restaurants</string>
+    <string name="workmates">Collègues</string>
+    <string name="search">Recherche</string>
+    <string name="hungry">J\'ai faim</string>
+    <string name="open_drawer">Open navigation drawer</string>
+    <string name="close_drawer">Close navigation drawer</string>
+    <string name="go4lunch">Go4Lunch</string>
+    <string name="user_s_profile_s_photo">Photo de profil utilisateur</string>
+    <string name="user_s_mail">Email utilisateur</string>
+    <string name="user_s_name">Nom utilisateur</string>
+    <string name="notifications">Notifications</string>
+    <string name="enable_notif">Autoriser les messages de notification</string>
+    <string name="notif_summary">Autoriser Go4Lunch à vous envoyer une notification à midi lorsque vous avez choisi un restaurant</string>
+    <string name="user_account">Compte utilisateur</string>
+    <string name="setting">Paramètres</string>
+    <string name="delete_account">Supprimer le compte</string>
+    <string name="are_you_sure_delete">Êtes-vous sûr de vouloir effacer votre compte?</string>
+    <string name="yes_sure">Oui, je suis sûr</string>
+    <string name="account_deleted">Votre compte a bien été effacé</string>
+    <string name="re_auth_to_delete">Vous devez vous identifier une nouvelle fois pour supprimer votre compte.</string>
+    <string name="available_workmates">Collègues disponibles</string>
+    <string name="deny">Refuser</string>
+    <string name="allow">Accepter</string>
+    <string name="without_location">Sans les permissions de location, nous ne pouvons pas vous localiser et afficher les restaurants se trouvant autour de vous.</string>
+    <string name="why_location">Pourquoi avons-nous besoin de ces permissions?</string>
+    <string name="restaurant_opening_hour">restaurant_opening_hour</string>
+    <string name="restaurant_address">restaurant_address</string>
+    <string name="dist">dist</string>
+    <string name="restaurant_name">restaurant_name</string>
+    <string name="rating_star_value">rating star value</string>
+    <string name="a_photo_of_the_restaurant">Une photo du restaurant</string>
+    <string name="no_info_hours">Il n\'y a aucune information sur les heures d\'ouverture</string>
+    <string name="closing_soon">Ferme bientôt</string>
+    <string name="open_until">"Ouvert jusqu'à "</string>
+    <string name="closed">Fermé</string>
+    <string name="meters">%1$d m</string>
+    <string name="address">adresse</string>
+    <string name="name">nom</string>
+    <string name="call_icon">icône d\'appel</string>
+    <string name="like_star">like star</string>
+    <string name="web_icon">web icon</string>
+    <string name="call">Appeler</string>
+    <string name="like">Liker</string>
+    <string name="website">Site web</string>
+    <string name="no_chosen_resto">Vous n\'avez pas encore choisi de restaurant aujourd\'hui</string>
+    <string name="you_like">Vous avez liké %1$s</string>
+    <string name="users_icon">Users icon</string>
+    <string name="user_number">(%1$d)</string>
+    <string name="a_photo_of_the_user">Une photo de l\'utilisateur</string>
+    <string name="chose">%1$s a choisi %2$s</string>
+    <string name="no_decided">%1$s n\'a pas encore décidé</string>
+    <string name="default_profil_phot_url">https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png</string>
+    <string name="is_joining">%1$s se joint à vous</string>
+    <string name="cancel">Réduire</string>
+    <string name="delete_logout">Supprimer le compte et se déconnecter</string>
+    <string name="here_to_delete">Cliquez ici si vous souhaiter supprimer votre compte</string>
+    <string name="already_like">Vous avez déjà liké %1$s</string>
+    <string name="you">Vous</string>
+
+</resources>

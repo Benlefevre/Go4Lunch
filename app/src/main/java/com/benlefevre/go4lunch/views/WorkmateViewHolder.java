@@ -11,11 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.controllers.activities.HomeActivity;
 import com.benlefevre.go4lunch.models.User;
+import com.benlefevre.go4lunch.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.benlefevre.go4lunch.utils.Constants.USER_NAME;
 
 public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,6 +40,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
     /**
      * Calls all needed methods to bind user's information into UI.
+     *
      * @param user the selected item's user.
      */
     public void updateUi(User user) {
@@ -44,14 +50,20 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
     /**
      * Binds the user's name into the TextView.
+     *
      * @param user the selected item's user.
      */
     private void updateUserName(User user) {
         if (user.getRestaurantName() != null) {
             if (mContext instanceof HomeActivity)
                 mUserName.setText(mContext.getString(R.string.chose, user.getDisplayName(), user.getRestaurantName()));
-            else
-                mUserName.setText(mContext.getString(R.string.is_joining,user.getDisplayName()));
+            else {
+                if (Objects.equals(mContext.getSharedPreferences(Constants.PREFERENCES, Context.MODE_PRIVATE)
+                        .getString(USER_NAME, "me"), user.getDisplayName()))
+                    mUserName.setText(mContext.getString(R.string.you));
+                else
+                    mUserName.setText(mContext.getString(R.string.is_joining, user.getDisplayName()));
+            }
             mUserName.setTextColor(mContext.getResources().getColor(R.color.black));
         } else {
             mUserName.setText(mContext.getString(R.string.no_decided, user.getDisplayName()));
@@ -61,6 +73,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
     /**
      * Binds the user's photo into the ImageView.
+     *
      * @param user the selected item's user.
      */
     private void updateUserPhoto(User user) {

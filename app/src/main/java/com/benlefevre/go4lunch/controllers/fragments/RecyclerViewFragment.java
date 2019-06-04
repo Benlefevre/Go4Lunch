@@ -130,9 +130,9 @@ public class RecyclerViewFragment extends Fragment {
      * the requested collection.
      */
     private void configureRecyclerViewForActivityRestaurant() {
-        Query query = UserHelper.getUsersCollection().whereEqualTo("restaurantName",mRestaurantName);
+        Query query = UserHelper.getUsersCollection().whereEqualTo("restaurantName", mRestaurantName);
         FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
-                .setQuery(query,User.class)
+                .setQuery(query, User.class)
                 .setLifecycleOwner(this)
                 .build();
         WorkmateAdapter workmateAdapter = new WorkmateAdapter(options);
@@ -179,7 +179,7 @@ public class RecyclerViewFragment extends Fragment {
                 }
 //               When all restaurant are fetched, we configure the RecyclerView's adapter.
                 if (mRestaurantList.size() == mIdList.size()) {
-                    configureRecyclerViewForRestaurants();
+                    configureRecyclerViewForRestaurants(mRestaurantList);
                 }
             });
         }
@@ -188,22 +188,38 @@ public class RecyclerViewFragment extends Fragment {
     /**
      * Configures the RecyclerView with a  RestaurantAdapter and sets an ItemClickListener and it's action.
      */
-    private void configureRecyclerViewForRestaurants() {
-        mRestaurantAdapter = new RestaurantAdapter(mRestaurantList);
+    private void configureRecyclerViewForRestaurants(List<Restaurant> restaurants) {
+        mRestaurantAdapter = new RestaurantAdapter(restaurants);
         mRestaurantAdapter.setOnItemClickListener(v -> {
             RestaurantViewHolder holder = (RestaurantViewHolder) v.getTag();
             int position = holder.getAdapterPosition();
             Intent intent = new Intent(mActivity, RestaurantActivity.class);
-            intent.putExtra(RESTAURANT_NAME, mRestaurantList.get(position).getName());
+            intent.putExtra(RESTAURANT_NAME, restaurants.get(position).getName());
             startActivity(intent);
         });
         mRecyclerView.setAdapter(mRestaurantAdapter);
         mRestaurantAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Displays only the selected restaurant in Autocomplete widget into the RecyclerView;
+     * @param restaurantId the selected restaurant's Id to fetch it into mRestaurantList.
+     */
+    public void showSelectedRestaurant(String restaurantId) {
+        List<Restaurant> restaurants = new ArrayList<>();
+        for (Restaurant restaurant : mRestaurantList) {
+            if (restaurant.getUid().equals(restaurantId)) {
+                restaurants.add(restaurant);
+                configureRecyclerViewForRestaurants(restaurants);
+            }
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+//        Calls notifyDataSetChanged on the RestaurantAdapter when the user press the back button in
+//        RestaurantActivity if he came in from RestaurantFragment.
         if (mRestaurantAdapter != null) {
             mRestaurantAdapter.notifyDataSetChanged();
         }

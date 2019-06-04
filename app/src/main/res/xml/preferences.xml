@@ -17,8 +17,8 @@
 
         <Preference
             android:key="account"
-            android:title="Delete account and log out"
-            android:summary="Click here if you want delete your Go4Lunch account"/>
+            android:title="@string/delete_logout"
+            android:summary="@string/here_to_delete"/>
 
     </PreferenceCategory>
 </PreferenceScreen>
