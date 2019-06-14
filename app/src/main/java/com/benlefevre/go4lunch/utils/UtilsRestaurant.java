@@ -80,10 +80,12 @@ public class UtilsRestaurant {
      * @return the opening hours information according to the current day.
      */
     public static String displayOpeningHours(Restaurant restaurant, Context context) {
-        if (restaurant.getOpeningHours() == null)
+        int day = getDay();
+
+        if (restaurant.getOpeningHours() == null || restaurant.getOpeningHours().size() < day)
             return context.getString(R.string.no_info_hours);
 
-        int day = getDay();
+
         String closeHour = restaurant.getOpeningHours().get(day).get("close");
         String openHour = restaurant.getOpeningHours().get(day).get("open");
         Calendar now = Calendar.getInstance();

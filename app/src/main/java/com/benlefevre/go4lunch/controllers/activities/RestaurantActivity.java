@@ -154,14 +154,15 @@ public class RestaurantActivity extends BaseActivity {
         List<Place.Field> fields = Collections.singletonList(Place.Field.PHOTO_METADATAS);
         FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(mRestaurantUid, fields).build();
         mClient.fetchPlace(placeRequest).addOnSuccessListener(fetchPlaceResponse -> {
-            if (Objects.requireNonNull(fetchPlaceResponse.getPlace().getPhotoMetadatas()).get(0) != null) {
+            if (fetchPlaceResponse.getPlace().getPhotoMetadatas() != null && fetchPlaceResponse.getPlace().getPhotoMetadatas().get(0) != null) {
                 Place place = fetchPlaceResponse.getPlace();
                 FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(place.getPhotoMetadatas().get(0)).build();
                 mClient.fetchPhoto(photoRequest).addOnSuccessListener(fetchPhotoResponse -> {
                     Bitmap bitmap = fetchPhotoResponse.getBitmap();
                     mRestaurantImg.setImageBitmap(bitmap);
                 });
-            }
+            } else
+                mRestaurantImg.setImageResource(R.drawable.ic_restaurant2_24dp);
         });
     }
 

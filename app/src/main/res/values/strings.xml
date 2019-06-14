@@ -4,8 +4,8 @@
     <string name="facebook_application_id">296011911276762</string>
     <string name="fb_login_protocol_scheme">fb296011911276762</string>
 
-    <string name="twitter_consumer_key" translatable="false">SZ2vdqtLXeURjnJJCsXpTzp0M</string>
-    <string name="twitter_consumer_secret" translatable="false">mtDEAfWuglWmXzLeumYRWzM8qBhunolhVDZ0g4TQ3FIUrBOpb5</string>
+    <string name="twitter_consumer_key" translatable="false">HjLEIjzRqj9pBxVoZYFNynNCk </string>
+    <string name="twitter_consumer_secret" translatable="false">LizeQC7C8Gqiaw4V0dGTABPaFx5zWpGg4aGc22aQZokPH3eT4f </string>
 
     <string name="auth_failed">Authentification failed, please try again</string>
     <string name="network_access">Network Access is necessary to sign in</string>
@@ -70,7 +70,7 @@
     <string name="is_joining">%1$s is joining</string>
     <string name="delete_logout">Delete account and log out</string>
     <string name="here_to_delete">Click here if you want delete your Go4Lunch account</string>
-    <string name="already_like">You\'ve already like %1$s</string>
+    <string name="already_like">You\'ve already liked %1$s</string>
     <string name="you">You</string>
     <string name="notif_pref">notification</string>
     <string name="you_notif">You,</string>

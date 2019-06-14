@@ -149,10 +149,10 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
                         if (task1.isSuccessful() && task1.getResult() != null) {
                             Bitmap bitmap = task1.getResult().getBitmap();
                             mPhoto.setImageBitmap(bitmap);
-                        } else
-                            mPhoto.setImageResource(R.drawable.ic_restaurant2_24dp);
+                        }
                     });
-                }
+                }else
+                    mPhoto.setImageResource(R.drawable.ic_restaurant2_24dp);
             }
         });
     }

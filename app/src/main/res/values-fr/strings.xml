@@ -4,9 +4,6 @@
     <string name="facebook_application_id">296011911276762</string>
     <string name="fb_login_protocol_scheme">fb296011911276762</string>
 
-    <string name="twitter_consumer_key" translatable="false">SZ2vdqtLXeURjnJJCsXpTzp0M</string>
-    <string name="twitter_consumer_secret" translatable="false">mtDEAfWuglWmXzLeumYRWzM8qBhunolhVDZ0g4TQ3FIUrBOpb5</string>
-
     <string name="auth_failed">L\'identification a échoué, merci de réessayer.</string>
     <string name="network_access">Un accès réseau is nécessaire pour vous identifier</string>
     <string name="unknown_error">Il y a une erreur inconnue</string>

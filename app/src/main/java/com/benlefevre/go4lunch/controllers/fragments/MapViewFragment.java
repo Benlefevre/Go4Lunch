@@ -143,6 +143,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()) {
                     mUserList.add(documentSnapshot.toObject(User.class));
                 }
+                addMarkerOnMap();
             }
         });
     }
@@ -171,6 +172,18 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             intent.putExtra(RESTAURANT_NAME, marker.getTitle());
             startActivity(intent);
         });
+        mGoogleMap.setOnMarkerClickListener(marker -> {
+            if (marker.getTitle().equals(marker.getTag())){
+                marker.setTag(null);
+                Intent intent = new Intent(mActivity, RestaurantActivity.class);
+                intent.putExtra(RESTAURANT_NAME, marker.getTitle());
+                startActivity(intent);
+            } else{
+                marker.showInfoWindow();
+                marker.setTag(marker.getTitle());
+            }
+            return true;
+        });
 //        Request the user's location to GooglePlay services.
         getLastKnownLocation();
     }
@@ -188,7 +201,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                     if (location != null) {
                         mLastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
                         mGoogleMap.setMyLocationEnabled(true);
-                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 18));
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastKnownLocation, 19));
                         LatLngBounds bound = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
                         mSharedPreferences.edit().putFloat(USER_LAT, (float) mLastKnownLocation.latitude).apply();
                         mSharedPreferences.edit().putFloat(USER_LONG, (float) mLastKnownLocation.longitude).apply();
@@ -290,6 +303,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      * Adds a marker on map according to the place's location and the place's name.
      */
     private void addMarkerOnMap() {
+        if(mGoogleMap != null)
+            mGoogleMap.clear();
         if (mPlaceList != null && !mPlaceList.isEmpty()) {
             for (Place place : mPlaceList) {
                 int count = 0;
@@ -357,7 +372,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onPause() {
         super.onPause();
         mMapView.onPause();
-        mGoogleMap.clear();
     }
 
     @Override
