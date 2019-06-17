@@ -328,10 +328,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     /**
      * Move the map's camera to the selected restaurant's.
      *
-     * @param latLng the restaurant's location as LatLng.
+     * @param restaurantName the restaurant's name.
      */
-    public void moveCameraToSelectedRestaurant(LatLng latLng) {
-        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 22));
+    public void moveCameraToSelectedRestaurant(String restaurantName) {
+        for (Place place:mPlaceList){
+            if (Objects.equals(place.getName(), restaurantName) && place.getLatLng() != null)
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+                        place.getLatLng().latitude,place.getLatLng().longitude), 22));
+        }
     }
 
 

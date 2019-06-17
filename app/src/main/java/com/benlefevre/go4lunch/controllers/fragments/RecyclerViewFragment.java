@@ -202,12 +202,12 @@ public class RecyclerViewFragment extends Fragment {
 
     /**
      * Displays only the selected restaurant in Autocomplete widget into the RecyclerView;
-     * @param restaurantId the selected restaurant's Id to fetch it into mRestaurantList.
+     * @param restaurantName the selected restaurant's Id to fetch it into mRestaurantList.
      */
-    public void showSelectedRestaurant(String restaurantId) {
+    public void showSelectedRestaurant(String restaurantName) {
         List<Restaurant> restaurants = new ArrayList<>();
         for (Restaurant restaurant : mRestaurantList) {
-            if (restaurant.getUid().equals(restaurantId)) {
+            if (restaurant.getName().equals(restaurantName)) {
                 restaurants.add(restaurant);
                 configureRecyclerViewForRestaurants(restaurants);
             }

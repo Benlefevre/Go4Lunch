@@ -76,5 +76,7 @@
     <string name="is_located">%1$s est situé à l\'adresse :</string>
     <string name="you_lunch_with">Vous pouvez déjeuner avec :</string>
     <string name="recall">Juste un petit rappel</string>
+    <string name="search_a_restaurant">Rechercher un restaurant</string>
+    <string name="clear_text_button">Boutton de suppression du texte</string>
 
 </resources>
