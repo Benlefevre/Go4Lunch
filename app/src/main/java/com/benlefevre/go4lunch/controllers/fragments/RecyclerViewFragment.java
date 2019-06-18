@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.benlefevre.go4lunch.R;
 import com.benlefevre.go4lunch.adapters.RestaurantAdapter;
@@ -46,6 +47,8 @@ public class RecyclerViewFragment extends Fragment {
 
     @BindView(R.id.recycler_fragment_recyclerview)
     RecyclerView mRecyclerView;
+    @BindView(R.id.recycler_fragment_swipe_layout)
+    SwipeRefreshLayout mSwipeLayout;
 
     private Activity mActivity;
     private String origin;
@@ -92,6 +95,7 @@ public class RecyclerViewFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_recycler_view, container, false);
         ButterKnife.bind(this, view);
+        configureSwipeRefreshLayout();
         initRecyclerView();
         return view;
     }
@@ -198,10 +202,12 @@ public class RecyclerViewFragment extends Fragment {
         });
         mRecyclerView.setAdapter(mRestaurantAdapter);
         mRestaurantAdapter.notifyDataSetChanged();
+        mSwipeLayout.setRefreshing(false);
     }
 
     /**
      * Displays only the selected restaurant in Autocomplete widget into the RecyclerView;
+     *
      * @param restaurantName the selected restaurant's Id to fetch it into mRestaurantList.
      */
     public void showSelectedRestaurant(String restaurantName) {
@@ -212,6 +218,18 @@ public class RecyclerViewFragment extends Fragment {
                 configureRecyclerViewForRestaurants(restaurants);
             }
         }
+    }
+
+    /**
+     * Defines the bahavior of mSwipeLayout according the fragment's origin.
+     */
+    private void configureSwipeRefreshLayout(){
+        mSwipeLayout.setOnRefreshListener(() -> {
+            if (origin.equals(RESTAURANT))
+                fetchRestaurantInFirestore(mIdList);
+            else
+                mSwipeLayout.setRefreshing(false);
+        });
     }
 
     @Override

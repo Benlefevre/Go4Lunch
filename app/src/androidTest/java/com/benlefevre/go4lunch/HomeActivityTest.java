@@ -1,7 +1,7 @@
 package com.benlefevre.go4lunch;
 
-import android.content.Intent;
 import android.view.Gravity;
+import android.view.View;
 
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -20,59 +20,84 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import leakcanary.LeakSentry;
+
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isSelected;
-import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static com.schibsted.spain.barista.assertion.BaristaAssertions.assertThatBackButtonClosesTheApp;
 import static com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosedWithGravity;
 import static com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsOpenWithGravity;
+import static com.schibsted.spain.barista.assertion.BaristaHintAssertions.assertHint;
 import static com.schibsted.spain.barista.assertion.BaristaListAssertions.assertListItemCount;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed;
+import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed;
+import static com.schibsted.spain.barista.interaction.BaristaAutoCompleteTextViewInteractions.writeToAutoComplete;
 import static com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack;
 import static com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn;
 import static com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer;
 import static com.schibsted.spain.barista.interaction.BaristaListInteractions.clickListItem;
 import static com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep;
+import static com.schibsted.spain.barista.interaction.BaristaSwipeRefreshInteractions.refresh;
+import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(AndroidJUnit4.class)
 public class HomeActivityTest {
 
     private UiDevice mUiDevice;
+    private View mDecorView;
 
     @Rule
     public ActivityScenarioRule<HomeActivity> mHomeActivityActivityScenarioRule = new ActivityScenarioRule<>(HomeActivity.class);
 
     @Before
-    public void setUp(){
-        mUiDevice = UiDevice.getInstance(getInstrumentation());
-        Intents.init();
+    public void setUp() {
+        mHomeActivityActivityScenarioRule.getScenario().onActivity(activity -> {
+            mDecorView = activity.getWindow().getDecorView();
+        });
+            Intents.init();
     }
 
     @After
-    public void releaseDatas(){
+    public void releaseData() {
         Intents.release();
+        LeakSentry.INSTANCE.getRefWatcher().clearWatchedReferences();
     }
 
     @Test
-    public void ToolbarTest(){
+    public void toolbarTest() {
         assertDisplayed(R.id.home_activity_toolbar);
         assertDisplayed(R.id.toolbar_search);
         assertContains(R.string.hungry);
         clickOn(R.id.toolbar_search);
-        assertDisplayed(R.id.autoCompleteTextView);
+        assertDisplayed(R.id.home_activity_auto_complete_Txt);
         assertDisplayed(R.id.home_activity_cleartext_btn);
+        clickOn(R.id.home_activity_cleartext_btn);
+        assertNotDisplayed(R.id.home_activity_autocomplete_layout);
+        clickOn(R.id.toolbar_search);
+        assertDisplayed(R.id.home_activity_autocomplete_layout);
+        clickBack();
+        assertNotDisplayed(R.id.home_activity_autocomplete_layout);
     }
 
     @Test
-    public void BottomBarAndDrawerTest(){
+    public void bottomBarAndDrawerTest() {
+        openDrawer();
+        assertDrawerIsOpenWithGravity(Gravity.START);
+        assertDisplayed(R.string.your_lunch);
+        assertDisplayed(R.string.settings);
+        assertDisplayed(R.string.logout);
+        clickBack();
+        assertDrawerIsClosedWithGravity(Gravity.START);
+
         assertDisplayed(R.id.home_activity_bottombar);
         assertDisplayed(R.string.map_view);
         onView(withId(R.id.bottom_map)).check(matches(isSelected()));
@@ -87,42 +112,59 @@ public class HomeActivityTest {
         onView(withId(R.id.bottom_workmates)).check(matches(isSelected()));
         assertContains(R.string.available_workmates);
 
-        openDrawer();
-        assertDrawerIsOpenWithGravity(Gravity.START);
-        assertDisplayed(R.string.your_lunch);
-        assertDisplayed(R.string.settings);
-        assertDisplayed(R.string.logout);
-        clickBack();
-        assertDrawerIsClosedWithGravity(Gravity.START);
     }
 
     @Test
-    public void AutocompleteTest() throws UiObjectNotFoundException {
-//        clickOn(R.id.toolbar_search);
-//        onView(withHint("Search")).perform(typeText("Partie de Campagne"));
-//        sleep(500);
-//        assertContains("Cour Saint-Emilion, Paris, France");
-//        clickOn("Cour Saint-Emilion, Paris, France");
-//
-//        UiObject marker = mUiDevice.findObject(new UiSelector().descriptionContains("Partie de Campagne"));
-//        marker.click();
-//        marker.click();
-//        intended(hasExtra(Constants.RESTAURANT_NAME,"Partie de Campagne"));
-//        Intents.release();
-//        Intents.init();
-//        clickBack();
-//        assertContains(R.string.hungry);
-//
-//        clickOn(R.id.bottom_restaurant);
-//        clickOn(R.id.toolbar_search);
-//        onView(withHint("Search")).perform(typeText("Partie de Campagne"));
-//        sleep(500);
-//        clickOn("Cour Saint-Emilion, Paris, France");
-//
-//        assertListItemCount(R.id.recycler_fragment_recyclerview,1);
-//        clickListItem(R.id.recycler_fragment_recyclerview,0);
-//        intended(hasExtra(Constants.RESTAURANT_NAME,"Partie de Campagne"));
-//        clickBack();
-//        assertContains(R.string.hungry);
+    public void autocompleteUiTest() {
+        assertDisplayed(R.id.home_activity_toolbar);
+        assertDisplayed(R.id.toolbar_search);
+        assertContains(R.string.hungry);
+        clickOn(R.id.toolbar_search);
+        clickOn(R.id.home_activity_auto_complete_Txt);
+        assertHint(R.id.home_activity_auto_complete_Txt, R.string.search_a_restaurant);
+        writeToAutoComplete(R.id.home_activity_auto_complete_Txt, "fac");
+        onView(withText("Factory & Co")).inRoot(withDecorView(not(mDecorView))).check(matches(isDisplayed()));
+        clickOn(R.id.home_activity_cleartext_btn);
+        assertHint(R.id.home_activity_auto_complete_Txt, R.string.search_a_restaurant);
+        clickOn(R.id.home_activity_cleartext_btn);
+        assertNotDisplayed(R.id.home_activity_auto_complete_Txt);
+    }
+
+    @Test
+    public void autocompleteBehaviorTestMapFragment() throws UiObjectNotFoundException {
+        mUiDevice = UiDevice.getInstance(getInstrumentation());
+        assertDisplayed(R.id.home_activity_toolbar);
+        assertDisplayed(R.id.toolbar_search);
+        assertContains(R.string.hungry);
+        clickOn(R.id.toolbar_search);
+        clickOn(R.id.home_activity_auto_complete_Txt);
+        assertHint(R.id.home_activity_auto_complete_Txt, R.string.search_a_restaurant);
+        writeToAutoComplete(R.id.home_activity_auto_complete_Txt, "eric");
+        onView(withText("Eric Kayser - Bercy Village")).inRoot(withDecorView(not(mDecorView))).perform(click());
+        UiObject marker = mUiDevice.findObject(new UiSelector().descriptionContains("Eric Kayser - Bercy Village"));
+        marker.click();
+        marker = mUiDevice.findObject(new UiSelector().descriptionContains("Eric Kayser - Bercy Village"));
+        marker.click();
+        intended(hasExtra(Constants.RESTAURANT_NAME, "Eric Kayser - Bercy Village"));
+
+    }
+
+    @Test
+    public void autocompleteBehaviorTestRecyclerViewFragment(){
+        assertDisplayed(R.id.home_activity_toolbar);
+        assertDisplayed(R.id.toolbar_search);
+        assertContains(R.string.hungry);
+        sleep(500);
+        clickOn(R.id.bottom_restaurant);
+        clickOn(R.id.toolbar_search);
+        clickOn(R.id.home_activity_auto_complete_Txt);
+        writeToAutoComplete(R.id.home_activity_auto_complete_Txt,"prad");
+        onView(withText("Maison Pradier")).inRoot(withDecorView(not(mDecorView))).perform(click());
+        assertListItemCount(R.id.recycler_fragment_recyclerview,1);
+        clickListItem(R.id.recycler_fragment_recyclerview,0);
+        intended(hasExtra(Constants.RESTAURANT_NAME,"Maison Pradier"));
+        clickBack();
+        refresh();
+
     }
 }

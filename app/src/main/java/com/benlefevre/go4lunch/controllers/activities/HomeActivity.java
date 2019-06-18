@@ -91,7 +91,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     NavigationView mNavView;
     @BindView(R.id.home_activity_drawer)
     DrawerLayout mDrawer;
-    @BindView(R.id.autoCompleteTextView)
+    @BindView(R.id.home_activity_auto_complete_Txt)
     AutoCompleteTextView mAutoCompleteTextView;
     @BindView(R.id.home_activity_cleartext_btn)
     ImageButton mCleartextBtn;
@@ -283,7 +283,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         mClient.findAutocompletePredictions(request).addOnSuccessListener(predictionsResponse -> {
             if (!predictionsResponse.getAutocompletePredictions().isEmpty()) {
                 for (AutocompletePrediction prediction : predictionsResponse.getAutocompletePredictions()) {
-                    if (mIdList.contains(prediction.getPlaceId())) {
+                    if ( mIdList.contains(prediction.getPlaceId())) {
                         mArrayAdapter.clear();
                         mArrayAdapter.add(prediction.getPrimaryText(null).toString());
                         mArrayAdapter.notifyDataSetChanged();

@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="@+id/home_activity_toolbar">
 
             <AutoCompleteTextView
-                android:id="@+id/autoCompleteTextView"
+                android:id="@+id/home_activity_auto_complete-Txt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
