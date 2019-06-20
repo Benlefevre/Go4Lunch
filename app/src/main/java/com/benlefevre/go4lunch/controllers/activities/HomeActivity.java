@@ -61,6 +61,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.IS_LOGGED;
 import static com.benlefevre.go4lunch.utils.Constants.LAT_NORTH;
@@ -75,6 +76,7 @@ import static com.benlefevre.go4lunch.utils.Constants.PERMISSIONS_REQUEST_ACCESS
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_FRAGMENT;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.USER_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
@@ -393,10 +395,12 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      * Verifies if the user has choose a restaurant and open the RestaurantActivity if he has.
      */
     private void getUserChosenRestaurant() {
-        String chosenRestaurant = mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, null);
-        if (chosenRestaurant != null) {
+        String chosenRestaurantName = mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, null);
+        String chosenRestaurantId= mSharedPreferences.getString(CHOSEN_RESTAURANT_ID,null);
+        if (chosenRestaurantName != null) {
             Intent intent = new Intent(this, RestaurantActivity.class);
-            intent.putExtra(RESTAURANT_NAME, chosenRestaurant);
+            intent.putExtra(RESTAURANT_NAME, chosenRestaurantName);
+            intent.putExtra(RESTAURANT_ID,chosenRestaurantId);
             startActivity(intent);
         } else
             Toast.makeText(this, getString(R.string.no_chosen_resto), Toast.LENGTH_SHORT).show();

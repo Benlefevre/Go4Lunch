@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +35,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -62,6 +64,7 @@ import static com.benlefevre.go4lunch.utils.Constants.LONG_NORTH;
 import static com.benlefevre.go4lunch.utils.Constants.LONG_SOUTH;
 import static com.benlefevre.go4lunch.utils.Constants.PERMISSION_GRANTED;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.USER_LAT;
 import static com.benlefevre.go4lunch.utils.Constants.USER_LONG;
@@ -170,19 +173,36 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         mGoogleMap.setOnInfoWindowClickListener(marker -> {
             Intent intent = new Intent(mActivity, RestaurantActivity.class);
             intent.putExtra(RESTAURANT_NAME, marker.getTitle());
+            intent.putExtra(RESTAURANT_ID,marker.getSnippet());
             startActivity(intent);
         });
+//        Sets the realized action when user click on a Marker
         mGoogleMap.setOnMarkerClickListener(marker -> {
             if (marker.getTitle().equals(marker.getTag())){
                 marker.setTag(null);
                 Intent intent = new Intent(mActivity, RestaurantActivity.class);
                 intent.putExtra(RESTAURANT_NAME, marker.getTitle());
+                intent.putExtra(RESTAURANT_ID,marker.getSnippet());
                 startActivity(intent);
             } else{
                 marker.showInfoWindow();
                 marker.setTag(marker.getTitle());
             }
             return true;
+        });
+//        Defines witch marker's data are bind in InfoWindow
+        mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+            @Override
+            public View getInfoContents(Marker marker) {
+                View view = LayoutInflater.from(mActivity).inflate(R.layout.infowindow_item,null);
+                TextView textView = view.findViewById(R.id.infowindow_twt);
+                textView.setText(marker.getTitle());
+                return view;
+            }
         });
 //        Request the user's location to GooglePlay services.
         getLastKnownLocation();
@@ -256,7 +276,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      */
     private void fetchDetailsAboutRestaurants(String placeId) {
 //        Defines witch fields we want in the query's response.
-        List<Place.Field> fields = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS,
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID,Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS,
                 Place.Field.ADDRESS_COMPONENTS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI,
                 Place.Field.OPENING_HOURS, Place.Field.RATING);
 //        Creates the request with the defined fields about the given place.
@@ -315,10 +335,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 }
                 if (place.getLatLng() != null) {
                     if (count > 0)
-                        mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng())
+                        mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).snippet(place.getId())
                                 .title(place.getName()).icon(BitmapDescriptorFactory.fromBitmap(mBitmapGreen)));
                     else
-                        mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng())
+                        mGoogleMap.addMarker(new MarkerOptions().position(place.getLatLng()).snippet(place.getId())
                                 .title(place.getName()).icon(BitmapDescriptorFactory.fromBitmap(mBitmapOrange)));
                 }
             }

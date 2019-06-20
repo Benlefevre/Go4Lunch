@@ -39,6 +39,7 @@ import static com.benlefevre.go4lunch.utils.Constants.ID_LIST;
 import static com.benlefevre.go4lunch.utils.Constants.ORIGIN;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ACTIVITY;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.WORKMATES;
 
@@ -161,6 +162,7 @@ public class RecyclerViewFragment extends Fragment {
             if (user != null && user.getRestaurantName() != null) {
                 Intent intent = new Intent(mActivity, RestaurantActivity.class);
                 intent.putExtra(RESTAURANT_NAME, user.getRestaurantName());
+                intent.putExtra(RESTAURANT_ID,user.getRestaurantId());
                 startActivity(intent);
             }
         });
@@ -198,6 +200,7 @@ public class RecyclerViewFragment extends Fragment {
             int position = holder.getAdapterPosition();
             Intent intent = new Intent(mActivity, RestaurantActivity.class);
             intent.putExtra(RESTAURANT_NAME, restaurants.get(position).getName());
+            intent.putExtra(RESTAURANT_ID,restaurants.get(position).getUid());
             startActivity(intent);
         });
         mRecyclerView.setAdapter(mRestaurantAdapter);

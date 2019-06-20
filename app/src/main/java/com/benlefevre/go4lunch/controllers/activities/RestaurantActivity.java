@@ -39,6 +39,7 @@ import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ACTIVITY;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 
 public class RestaurantActivity extends BaseActivity {
@@ -89,6 +90,7 @@ public class RestaurantActivity extends BaseActivity {
         mUserUid = getCurrentUser().getUid();
         mSharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
         mRestaurantName = getIntent().getStringExtra(RESTAURANT_NAME);
+        mRestaurantUid = getIntent().getStringExtra(RESTAURANT_ID);
         mChoiceDate = new Date();
         initPlaceApi();
         updateUi();
@@ -115,12 +117,11 @@ public class RestaurantActivity extends BaseActivity {
      * Calls all needed methods to fetch restaurant's information and update views.
      */
     private void updateUi() {
-        RestaurantHelper.getRestaurantsCollection().whereEqualTo("name", mRestaurantName).get()
+        RestaurantHelper.getRestaurantsCollection().whereEqualTo("uid", mRestaurantUid).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.getDocuments().get(0) != null) {
                         mRestaurant = queryDocumentSnapshots.getDocuments().get(0).toObject(Restaurant.class);
                         if (mRestaurant != null) {
-                            mRestaurantUid = mRestaurant.getUid();
                             mNameTxt.setText(mRestaurant.getName());
                             mAddressTxt.setText(mRestaurant.getAddress());
                             if (mRestaurant.getPhoneNumber() != null)

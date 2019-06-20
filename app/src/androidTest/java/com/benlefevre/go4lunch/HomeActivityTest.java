@@ -33,6 +33,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isSelected;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static com.benlefevre.go4lunch.utils.Constants.*;
 import static com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosedWithGravity;
 import static com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsOpenWithGravity;
 import static com.schibsted.spain.barista.assertion.BaristaHintAssertions.assertHint;
@@ -121,7 +122,7 @@ public class HomeActivityTest {
         clickOn(R.id.home_activity_auto_complete_Txt);
         assertHint(R.id.home_activity_auto_complete_Txt, R.string.search_a_restaurant);
         writeToAutoComplete(R.id.home_activity_auto_complete_Txt, "fac");
-        onView(withText("Factory & Co")).inRoot(withDecorView(not(mDecorView))).check(matches(isDisplayed()));
+        onView(withText("factory & co")).inRoot(withDecorView(not(mDecorView))).check(matches(isDisplayed()));
         clickOn(R.id.home_activity_cleartext_btn);
         assertHint(R.id.home_activity_auto_complete_Txt, R.string.search_a_restaurant);
         clickOn(R.id.home_activity_cleartext_btn);
@@ -142,7 +143,8 @@ public class HomeActivityTest {
         UiObject marker = mUiDevice.findObject(new UiSelector().descriptionContains("Eric Kayser - Bercy Village"));
         marker.click();
         marker.click();
-        intended(hasExtra(Constants.RESTAURANT_NAME, "Eric Kayser - Bercy Village"));
+        intended(hasExtra(RESTAURANT_NAME, "Eric Kayser - Bercy Village"));
+        intended(hasExtra(RESTAURANT_ID,"ChIJ92xQhT9y5kcRncxLxZXgMgY"));
     }
 
     @Test
@@ -158,7 +160,8 @@ public class HomeActivityTest {
         onView(withText("Maison Pradier")).inRoot(withDecorView(not(mDecorView))).perform(click());
         assertListItemCount(R.id.recycler_fragment_recyclerview,1);
         clickListItem(R.id.recycler_fragment_recyclerview,0);
-        intended(hasExtra(Constants.RESTAURANT_NAME,"Maison Pradier"));
+        intended(hasExtra(RESTAURANT_NAME,"Maison Pradier"));
+        intended(hasExtra(RESTAURANT_ID,"ChIJoTOBnD9y5kcRkHqdBW-Wa5k"));
         clickBack();
         refresh();
     }

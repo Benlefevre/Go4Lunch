@@ -43,6 +43,7 @@ public class Constants {
     public static final String LONG_SOUTH = "longSouth";
 
     public static final String RESTAURANT_NAME = "restaurantName";
+    public static final String RESTAURANT_ID = "restaurantID";
 
     public static final String CHOSEN_RESTAURANT_NAME = "chosenRestaurantName";
     public static final String CHOSEN_RESTAURANT_ADDRESS = "chosenRestaurantAddress";
