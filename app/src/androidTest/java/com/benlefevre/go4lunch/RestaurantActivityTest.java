@@ -49,21 +49,21 @@ public class RestaurantActivityTest {
     private UiDevice mUiDevice;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         mUiDevice = UiDevice.getInstance(getInstrumentation());
         mContext = getInstrumentation().getTargetContext();
-        Intent intent = new Intent(mContext,RestaurantActivity.class);
-        intent.putExtra(RESTAURANT_NAME,"Partie de Campagne");
+        Intent intent = new Intent(mContext, RestaurantActivity.class);
+        intent.putExtra(RESTAURANT_NAME, "Partie de Campagne");
         ActivityScenario<RestaurantActivity> activityScenario = ActivityScenario.launch(intent);
         activityScenario.onActivity(activity -> {
-            mSharedPreferences = mContext.getSharedPreferences(PREFERENCES,Context.MODE_PRIVATE);
+            mSharedPreferences = mContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
             mDecorView = activity.getWindow().getDecorView();
             mSharedPreferences.edit().remove("Partie de Campagne").apply();
         });
     }
 
     @Test
-    public void RestaurantActivityUiTest(){
+    public void RestaurantActivityUiTest() {
         assertDisplayed(R.id.activity_restaurant_img);
         assertDisplayed(R.id.activity_restaurant_name_txt);
         assertDisplayed(R.id.activity_restaurant_address_txt);
@@ -72,28 +72,28 @@ public class RestaurantActivityTest {
         assertDisplayed(R.id.activity_restaurant_like_img);
         assertDisplayed(R.id.activity_restaurant_web_img);
         sleep(2000);
-        assertContains(R.id.activity_restaurant_name_txt,"Partie de Campagne");
-        assertContains(R.id.activity_restaurant_address_txt,"36 Cour Saint-Emilion");
+        assertContains(R.id.activity_restaurant_name_txt, "Partie de Campagne");
+        assertContains(R.id.activity_restaurant_address_txt, "36 Cour Saint-Emilion");
 
         clickOn(R.id.activity_restaurant_floating_button);
-        assertEquals("Partie de Campagne",mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME,""));
-        assertEquals("ChIJgQKYmj9y5kcRaWWyHyK298A",mSharedPreferences.getString(CHOSEN_RESTAURANT_ID,""));
-        assertEquals("36 Cour Saint-Emilion",mSharedPreferences.getString(CHOSEN_RESTAURANT_ADDRESS,""));
+        assertEquals("Partie de Campagne", mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, ""));
+        assertEquals("ChIJgQKYmj9y5kcRaWWyHyK298A", mSharedPreferences.getString(CHOSEN_RESTAURANT_ID, ""));
+        assertEquals("36 Cour Saint-Emilion", mSharedPreferences.getString(CHOSEN_RESTAURANT_ADDRESS, ""));
 
-        assertListItemCount(R.id.recycler_fragment_recyclerview,1);
+        assertListItemCount(R.id.recycler_fragment_recyclerview, 1);
 
         clickOn(R.id.activity_restaurant_floating_button);
-        assertEquals("",mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME,""));
-        assertEquals("",mSharedPreferences.getString(CHOSEN_RESTAURANT_ID,""));
-        assertEquals("",mSharedPreferences.getString(CHOSEN_RESTAURANT_ADDRESS,""));
+        assertEquals("", mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, ""));
+        assertEquals("", mSharedPreferences.getString(CHOSEN_RESTAURANT_ID, ""));
+        assertEquals("", mSharedPreferences.getString(CHOSEN_RESTAURANT_ADDRESS, ""));
 
-        assertListItemCount(R.id.recycler_fragment_recyclerview,0);
-
-        clickOn(R.id.activity_restaurant_like_img);
-        onView(withText(mContext.getString(R.string.you_like,"Partie de Campagne"))).inRoot(withDecorView(is(not(mDecorView)))).check(matches(isDisplayed()));
+        assertListItemCount(R.id.recycler_fragment_recyclerview, 0);
 
         clickOn(R.id.activity_restaurant_like_img);
-        onView(withText(mContext.getString(R.string.already_like,"Partie de Campagne"))).inRoot(withDecorView(not(mDecorView))).check(matches(isDisplayed()));
+        onView(withText(mContext.getString(R.string.you_like, "Partie de Campagne"))).inRoot(withDecorView(is(not(mDecorView)))).check(matches(isDisplayed()));
+
+        clickOn(R.id.activity_restaurant_like_img);
+        onView(withText(mContext.getString(R.string.already_like, "Partie de Campagne"))).inRoot(withDecorView(not(mDecorView))).check(matches(isDisplayed()));
 
         Intents.init();
         clickOn(R.id.activity_restaurant_call_img);
@@ -107,5 +107,6 @@ public class RestaurantActivityTest {
         intended(hasAction(Intent.ACTION_VIEW));
         intended(hasData("http://www.partiedecampagne.com/"));
         mUiDevice.pressBack();
+        Intents.release();
     }
 }

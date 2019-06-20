@@ -4,10 +4,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class Constants {
 
+    public static final String IS_LOGGED = "isLogged";
+
     public static final String PREFERENCES = "sharedPreferences";
     public static final int RC_SIGN_IN = 123;
     public static final int SIGN_OUT_TASK = 123;
-    public static final int AUTOCOMPLETE_REQUEST = 456;
 
     public static final String USER_NAME = "userName";
 

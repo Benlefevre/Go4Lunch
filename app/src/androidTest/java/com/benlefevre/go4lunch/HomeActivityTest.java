@@ -60,9 +60,7 @@ public class HomeActivityTest {
 
     @Before
     public void setUp() {
-        mHomeActivityActivityScenarioRule.getScenario().onActivity(activity -> {
-            mDecorView = activity.getWindow().getDecorView();
-        });
+        mHomeActivityActivityScenarioRule.getScenario().onActivity(activity -> mDecorView = activity.getWindow().getDecorView());
             Intents.init();
     }
 
@@ -143,10 +141,8 @@ public class HomeActivityTest {
         onView(withText("Eric Kayser - Bercy Village")).inRoot(withDecorView(not(mDecorView))).perform(click());
         UiObject marker = mUiDevice.findObject(new UiSelector().descriptionContains("Eric Kayser - Bercy Village"));
         marker.click();
-        marker = mUiDevice.findObject(new UiSelector().descriptionContains("Eric Kayser - Bercy Village"));
         marker.click();
         intended(hasExtra(Constants.RESTAURANT_NAME, "Eric Kayser - Bercy Village"));
-
     }
 
     @Test
@@ -154,7 +150,7 @@ public class HomeActivityTest {
         assertDisplayed(R.id.home_activity_toolbar);
         assertDisplayed(R.id.toolbar_search);
         assertContains(R.string.hungry);
-        sleep(500);
+        sleep(1000);
         clickOn(R.id.bottom_restaurant);
         clickOn(R.id.toolbar_search);
         clickOn(R.id.home_activity_auto_complete_Txt);
@@ -165,6 +161,5 @@ public class HomeActivityTest {
         intended(hasExtra(Constants.RESTAURANT_NAME,"Maison Pradier"));
         clickBack();
         refresh();
-
     }
 }

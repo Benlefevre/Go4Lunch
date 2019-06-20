@@ -11,6 +11,9 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.benlefevre.go4lunch.R;
 
+import static com.benlefevre.go4lunch.utils.Constants.IS_LOGGED;
+import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+
 public class SettingsActivity extends BaseActivity {
 
     @Override
@@ -42,15 +45,20 @@ public class SettingsActivity extends BaseActivity {
             setPreferencesFromResource(R.xml.preferences, rootKey);
             SettingsActivity settingsActivity = (SettingsActivity) getActivity();
             Preference preference = findPreference("account");
-            preference.setOnPreferenceClickListener(preference1 -> {
-                new AlertDialog.Builder(settingsActivity)
-                        .setTitle(settingsActivity.getString(R.string.delete_account))
-                        .setMessage(settingsActivity.getString(R.string.are_you_sure_delete))
-                        .setPositiveButton(settingsActivity.getString(R.string.yes_sure), (dialog, which) -> settingsActivity.deleteUserAccountInFirebase())
-                        .setNegativeButton(settingsActivity.getString(R.string.cancel), (dialog, which) -> dialog.cancel())
-                        .show();
-                return true;
-            });
+            if (settingsActivity != null && preference != null) {
+                preference.setOnPreferenceClickListener(preference1 -> {
+                    new AlertDialog.Builder(settingsActivity)
+                            .setTitle(settingsActivity.getString(R.string.delete_account))
+                            .setMessage(settingsActivity.getString(R.string.are_you_sure_delete))
+                            .setPositiveButton(settingsActivity.getString(R.string.yes_sure), (dialog, which) -> {
+                                settingsActivity.deleteUserAccountInFirebase();
+                                settingsActivity.getSharedPreferences(PREFERENCES,MODE_PRIVATE).edit().remove(IS_LOGGED).apply();
+                            })
+                            .setNegativeButton(settingsActivity.getString(R.string.cancel), (dialog, which) -> dialog.cancel())
+                            .show();
+                    return true;
+                });
+            }
         }
     }
 }

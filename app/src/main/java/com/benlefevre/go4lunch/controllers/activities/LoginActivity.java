@@ -20,6 +20,7 @@ import java.util.List;
 
 import static com.benlefevre.go4lunch.utils.Constants.IDP_SECRET;
 import static com.benlefevre.go4lunch.utils.Constants.IDP_TOKEN;
+import static com.benlefevre.go4lunch.utils.Constants.IS_LOGGED;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
 import static com.benlefevre.go4lunch.utils.Constants.PROVIDER;
 import static com.benlefevre.go4lunch.utils.Constants.RC_SIGN_IN;
@@ -27,14 +28,16 @@ import static com.benlefevre.go4lunch.utils.Constants.RC_SIGN_IN;
 public class LoginActivity extends BaseActivity {
 
     private SharedPreferences mSharedPreferences;
+    private Boolean isLogged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
+        isLogged = mSharedPreferences.getBoolean(IS_LOGGED,false);
 
         // If the user is already logged, we display the HomeActivity else we display the login screen
-        if (isUserLogged()) {
+        if (isUserLogged() && isLogged) {
             startActivity(new Intent(this, HomeActivity.class));
             finish();
         } else
@@ -103,6 +106,7 @@ public class LoginActivity extends BaseActivity {
                     mSharedPreferences.edit().putString(PROVIDER, idpResponse.getProviderType()).apply();
                 mSharedPreferences.edit().putString(IDP_TOKEN, idpResponse.getIdpToken()).apply();
                 mSharedPreferences.edit().putString(IDP_SECRET, idpResponse.getIdpSecret()).apply();
+                mSharedPreferences.edit().putBoolean(IS_LOGGED,true).apply();
                 startActivity(new Intent(this, HomeActivity.class));
                 finish();
             } else {

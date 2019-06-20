@@ -62,6 +62,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
+import static com.benlefevre.go4lunch.utils.Constants.IS_LOGGED;
 import static com.benlefevre.go4lunch.utils.Constants.LAT_NORTH;
 import static com.benlefevre.go4lunch.utils.Constants.LAT_SOUTH;
 import static com.benlefevre.go4lunch.utils.Constants.LONG_NORTH;
@@ -360,6 +361,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
         switch (item.getItemId()) {
             case R.id.drawer_logout:
                 signOutFromFirebase();
+                mSharedPreferences.edit().remove(IS_LOGGED).apply();
                 break;
             case R.id.drawer_your_lunch:
                 getUserChosenRestaurant();
