@@ -358,7 +358,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
     /**
      * Creates 2 bitmaps from drawable resources.
      */

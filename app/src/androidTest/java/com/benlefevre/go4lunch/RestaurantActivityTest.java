@@ -29,6 +29,7 @@ import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ADDRESS;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.schibsted.spain.barista.assertion.BaristaListAssertions.assertListItemCount;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains;
@@ -54,6 +55,7 @@ public class RestaurantActivityTest {
         mContext = getInstrumentation().getTargetContext();
         Intent intent = new Intent(mContext, RestaurantActivity.class);
         intent.putExtra(RESTAURANT_NAME, "Partie de Campagne");
+        intent.putExtra(RESTAURANT_ID,"ChIJgQKYmj9y5kcRaWWyHyK298A");
         ActivityScenario<RestaurantActivity> activityScenario = ActivityScenario.launch(intent);
         activityScenario.onActivity(activity -> {
             mSharedPreferences = mContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);

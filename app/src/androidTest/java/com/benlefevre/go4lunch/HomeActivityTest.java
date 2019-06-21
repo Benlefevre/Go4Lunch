@@ -12,7 +12,6 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
 import com.benlefevre.go4lunch.controllers.activities.HomeActivity;
-import com.benlefevre.go4lunch.utils.Constants;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,7 +32,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.isSelected;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static com.benlefevre.go4lunch.utils.Constants.*;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosedWithGravity;
 import static com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsOpenWithGravity;
 import static com.schibsted.spain.barista.assertion.BaristaHintAssertions.assertHint;
@@ -61,8 +61,8 @@ public class HomeActivityTest {
 
     @Before
     public void setUp() {
+        Intents.init();
         mHomeActivityActivityScenarioRule.getScenario().onActivity(activity -> mDecorView = activity.getWindow().getDecorView());
-            Intents.init();
     }
 
     @After
@@ -144,11 +144,11 @@ public class HomeActivityTest {
         marker.click();
         marker.click();
         intended(hasExtra(RESTAURANT_NAME, "Eric Kayser - Bercy Village"));
-        intended(hasExtra(RESTAURANT_ID,"ChIJ92xQhT9y5kcRncxLxZXgMgY"));
+        intended(hasExtra(RESTAURANT_ID, "ChIJ92xQhT9y5kcRncxLxZXgMgY"));
     }
 
     @Test
-    public void autocompleteBehaviorTestRecyclerViewFragment(){
+    public void autocompleteBehaviorTestRecyclerViewFragment() {
         assertDisplayed(R.id.home_activity_toolbar);
         assertDisplayed(R.id.toolbar_search);
         assertContains(R.string.hungry);
@@ -156,12 +156,12 @@ public class HomeActivityTest {
         clickOn(R.id.bottom_restaurant);
         clickOn(R.id.toolbar_search);
         clickOn(R.id.home_activity_auto_complete_Txt);
-        writeToAutoComplete(R.id.home_activity_auto_complete_Txt,"prad");
+        writeToAutoComplete(R.id.home_activity_auto_complete_Txt, "prad");
         onView(withText("Maison Pradier")).inRoot(withDecorView(not(mDecorView))).perform(click());
-        assertListItemCount(R.id.recycler_fragment_recyclerview,1);
-        clickListItem(R.id.recycler_fragment_recyclerview,0);
-        intended(hasExtra(RESTAURANT_NAME,"Maison Pradier"));
-        intended(hasExtra(RESTAURANT_ID,"ChIJoTOBnD9y5kcRkHqdBW-Wa5k"));
+        assertListItemCount(R.id.recycler_fragment_recyclerview, 1);
+        clickListItem(R.id.recycler_fragment_recyclerview, 0);
+        intended(hasExtra(RESTAURANT_NAME, "Maison Pradier"));
+        intended(hasExtra(RESTAURANT_ID, "ChIJoTOBnD9y5kcRkHqdBW-Wa5k"));
         clickBack();
         refresh();
     }

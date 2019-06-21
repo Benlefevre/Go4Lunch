@@ -26,8 +26,7 @@ public class Restaurant {
         this.mail = mail;
         this.phoneNumber = phoneNumber;
     }
-
-    //    ------------------------------------ Getters -------------------------------------------------
+    //    ------------------------------------ Getters ---------------------------------------------
     public String getName() {
         return name;
     }
@@ -65,7 +64,7 @@ public class Restaurant {
         return like;
     }
 
-    //    ------------------------------------ Setters -------------------------------------------------
+    //    ------------------------------------ Setters ---------------------------------------------
     public void setName(String name) {
         this.name = name;
     }

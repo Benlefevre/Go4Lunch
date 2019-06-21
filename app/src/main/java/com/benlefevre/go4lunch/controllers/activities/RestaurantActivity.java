@@ -189,6 +189,10 @@ public class RestaurantActivity extends BaseActivity {
         }
     }
 
+    /**
+     * Defines the realized action when user clicks on a view
+     * @param view the clicked view
+     */
     @OnClick({R.id.activity_restaurant_floating_button, R.id.activity_restaurant_call_img, R.id.activity_restaurant_like_img, R.id.activity_restaurant_web_img})
     public void onViewClicked(View view) {
         switch (view.getId()) {

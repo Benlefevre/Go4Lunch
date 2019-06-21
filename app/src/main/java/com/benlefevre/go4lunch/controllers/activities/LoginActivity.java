@@ -28,13 +28,12 @@ import static com.benlefevre.go4lunch.utils.Constants.RC_SIGN_IN;
 public class LoginActivity extends BaseActivity {
 
     private SharedPreferences mSharedPreferences;
-    private Boolean isLogged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
-        isLogged = mSharedPreferences.getBoolean(IS_LOGGED,false);
+        boolean isLogged = mSharedPreferences.getBoolean(IS_LOGGED, false);
 
         // If the user is already logged, we display the HomeActivity else we display the login screen
         if (isUserLogged() && isLogged) {
@@ -97,6 +96,9 @@ public class LoginActivity extends BaseActivity {
         handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
+    /**
+     * Defines the activity's behavior according to the onActivityResult
+     */
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse idpResponse = IdpResponse.fromResultIntent(data);

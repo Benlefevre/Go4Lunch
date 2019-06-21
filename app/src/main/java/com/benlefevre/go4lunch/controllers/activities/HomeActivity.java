@@ -10,7 +10,6 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -30,9 +29,11 @@ import androidx.fragment.app.FragmentManager;
 
 import com.benlefevre.go4lunch.BuildConfig;
 import com.benlefevre.go4lunch.R;
+import com.benlefevre.go4lunch.adapters.AutoCompleteAdapter;
 import com.benlefevre.go4lunch.api.UserHelper;
 import com.benlefevre.go4lunch.controllers.fragments.MapViewFragment;
 import com.benlefevre.go4lunch.controllers.fragments.RecyclerViewFragment;
+import com.benlefevre.go4lunch.models.AutoCompleteItem;
 import com.benlefevre.go4lunch.models.User;
 import com.benlefevre.go4lunch.utils.UtilsUser;
 import com.bumptech.glide.Glide;
@@ -41,8 +42,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -55,6 +58,7 @@ import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -108,7 +112,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     private List<String> mIdList;
     private int displayedFragment;
     private PlacesClient mClient;
-    private ArrayAdapter<String> mArrayAdapter;
+    private AutoCompleteAdapter mAutoCompleteAdapter;
     private RectangularBounds mRectangularBounds;
 
     @Override
@@ -204,7 +208,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      * Configures AutoComplete UI and behaviors
      */
     private void configureAutoCompleteUI() {
-        mArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+        mAutoCompleteAdapter = new AutoCompleteAdapter(this, new ArrayList<>());
         mAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -221,7 +225,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
             }
         });
-        mAutoCompleteTextView.setAdapter(mArrayAdapter);
+        mAutoCompleteTextView.setAdapter(mAutoCompleteAdapter);
         mAutoCompleteTextView.setOnItemClickListener((adapterView, view, i, l) ->
                 updateUiAccordingToTheSelectedItem(adapterView.getItemAtPosition(i).toString()));
 
@@ -275,27 +279,35 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      */
     private void bindAutoCompletePrediction(CharSequence userInput) {
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS);
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
                 .setSessionToken(token)
                 .setCountry("fr")
                 .setLocationRestriction(mRectangularBounds)
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setQuery(userInput.toString().toLowerCase())
+                .setQuery(userInput.toString().toUpperCase())
                 .build();
 
         mClient.findAutocompletePredictions(request).addOnSuccessListener(predictionsResponse -> {
             if (!predictionsResponse.getAutocompletePredictions().isEmpty()) {
+                mAutoCompleteAdapter.clear();
                 for (AutocompletePrediction prediction : predictionsResponse.getAutocompletePredictions()) {
-                    if ( mIdList.contains(prediction.getPlaceId())) {
-                        mArrayAdapter.clear();
-                        mArrayAdapter.add(prediction.getPrimaryText(null).toString());
-                        mArrayAdapter.notifyDataSetChanged();
-                    }
+                    FetchPlaceRequest placeRequest = FetchPlaceRequest.builder(prediction.getPlaceId(), fields).build();
+                    mClient.fetchPlace(placeRequest).addOnSuccessListener(fetchPlaceResponse -> {
+                        if (mIdList.contains(prediction.getPlaceId())) {
+                            mAutoCompleteAdapter.add(new AutoCompleteItem(fetchPlaceResponse.getPlace().getName(),
+                                    fetchPlaceResponse. getPlace().getAddress()));
+                            mAutoCompleteAdapter.notifyDataSetChanged();
+                        }
+                    });
                 }
             }
         });
     }
 
+    /**
+     * Defines the menu layout that is bind in toolbar
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_activity_toolbar_menu, menu);
@@ -396,11 +408,11 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
      */
     private void getUserChosenRestaurant() {
         String chosenRestaurantName = mSharedPreferences.getString(CHOSEN_RESTAURANT_NAME, null);
-        String chosenRestaurantId= mSharedPreferences.getString(CHOSEN_RESTAURANT_ID,null);
+        String chosenRestaurantId = mSharedPreferences.getString(CHOSEN_RESTAURANT_ID, null);
         if (chosenRestaurantName != null) {
             Intent intent = new Intent(this, RestaurantActivity.class);
             intent.putExtra(RESTAURANT_NAME, chosenRestaurantName);
-            intent.putExtra(RESTAURANT_ID,chosenRestaurantId);
+            intent.putExtra(RESTAURANT_ID, chosenRestaurantId);
             startActivity(intent);
         } else
             Toast.makeText(this, getString(R.string.no_chosen_resto), Toast.LENGTH_SHORT).show();
@@ -414,22 +426,22 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
     private void displayFragmentAccordingToItemSelected(String origin) {
         switch (origin) {
             case MAP:
-                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), MAPVIEW)
-                            .commit();
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, MapViewFragment.newInstance(mLocationPermissionGranted), MAPVIEW)
+                        .commit();
                 break;
             case RESTAURANT:
-                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, RecyclerViewFragment.newInstance(RESTAURANT, mIdList), RESTAURANT_FRAGMENT)
-                            .commit();
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, RecyclerViewFragment.newInstance(RESTAURANT, mIdList), RESTAURANT_FRAGMENT)
+                        .commit();
                 break;
             case WORKMATES:
-                    mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, RecyclerViewFragment.newInstance(WORKMATES, mIdList), WORKMATE_FRAGMENT)
-                            .commit();
+                mFragmentManager.beginTransaction().replace(R.id.home_activity_frame_layout, RecyclerViewFragment.newInstance(WORKMATES, mIdList), WORKMATE_FRAGMENT)
+                        .commit();
                 break;
         }
     }
 
     /**
-     * Checks if the application has the user's permissions to locate him and requests them if it's haven't.
+     * Checks if the application has the user's permissions to locate him and requests them if it's hasn't.
      */
     private void getLocationPermission() {
         if ((ContextCompat.checkSelfPermission(this,
@@ -499,6 +511,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
 
     /**
      * Overrides the MapViewFragment's listener method to fetch the list of restaurant's ID
+     *
      * @param idList the list send from the MapViewFragment
      */
     @Override

@@ -25,8 +25,10 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ADDRESS;
+import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.CHOSEN_RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.PREFERENCES;
+import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_ID;
 import static com.benlefevre.go4lunch.utils.Constants.RESTAURANT_NAME;
 import static com.benlefevre.go4lunch.utils.Constants.USER_NAME;
 
@@ -35,6 +37,7 @@ public class NotificationHandler extends Worker {
     private Context mContext;
     private String mUserName;
     private String mRestaurantName;
+    private String mRestaurantId;
     private String mRestaurantAddress;
     private StringBuilder mWorkmates = new StringBuilder();
 
@@ -59,6 +62,7 @@ public class NotificationHandler extends Worker {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         mUserName = sharedPreferences.getString(USER_NAME, " ");
         mRestaurantName = sharedPreferences.getString(CHOSEN_RESTAURANT_NAME, "");
+        mRestaurantId = sharedPreferences.getString(CHOSEN_RESTAURANT_ID,"");
         mRestaurantAddress = sharedPreferences.getString(CHOSEN_RESTAURANT_ADDRESS, "");
 
     }
@@ -88,6 +92,7 @@ public class NotificationHandler extends Worker {
     private void sendNotification() {
         Intent intent = new Intent(mContext, RestaurantActivity.class);
         intent.putExtra(RESTAURANT_NAME, mRestaurantName);
+        intent.putExtra(RESTAURANT_ID,mRestaurantId);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         String channelId = "Go4Lunch notification";
@@ -97,7 +102,8 @@ public class NotificationHandler extends Worker {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(notificationChannel);
+            if(notificationManager != null)
+                notificationManager.createNotificationChannel(notificationChannel);
         }
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext, channelId)
@@ -113,7 +119,9 @@ public class NotificationHandler extends Worker {
                         .addLine(mWorkmates.toString())
                         .setBigContentTitle(mContext.getString(R.string.time_lunch))
                         .setSummaryText(mContext.getString(R.string.recall)));
-        notificationManager.notify(1,notification.build());
+        if (notificationManager != null) {
+            notificationManager.notify(1,notification.build());
+        }
     }
 
     /**
