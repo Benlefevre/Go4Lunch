@@ -2,6 +2,7 @@
 .gradle
 /gradle.properties
 /.functions/node_modules
+/app-debug.apk
 /local.properties
 /.idea/caches
 /.idea/libraries
