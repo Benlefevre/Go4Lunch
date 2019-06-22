@@ -73,7 +73,7 @@ public class RestaurantActivityTest {
         assertDisplayed(R.id.activity_restaurant_call_img);
         assertDisplayed(R.id.activity_restaurant_like_img);
         assertDisplayed(R.id.activity_restaurant_web_img);
-        sleep(2000);
+        sleep(1000);
         assertContains(R.id.activity_restaurant_name_txt, "Partie de Campagne");
         assertContains(R.id.activity_restaurant_address_txt, "36 Cour Saint-Emilion");
 

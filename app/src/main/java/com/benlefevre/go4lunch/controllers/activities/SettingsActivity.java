@@ -24,11 +24,17 @@ public class SettingsActivity extends BaseActivity {
         showPreferenceScreen();
     }
 
+    /**
+     * Bind a MySettingsFragment in the SettingsActivity's FrameLayout with the FragmentManager.
+     */
     private void showPreferenceScreen() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.settings_frame_layout, new MySettingsFragment()).commit();
     }
 
+    /**
+     * Defines our toolbar as the default ActionBar
+     */
     private void configureToolbar() {
         Toolbar toolbar = findViewById(R.id.settings_toolbar);
         toolbar.setTitle(getString(R.string.setting));

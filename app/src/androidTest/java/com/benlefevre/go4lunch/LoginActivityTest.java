@@ -27,12 +27,12 @@ public class LoginActivityTest {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         sharedPreferences.edit().remove(IS_LOGGED).apply();
-        ActivityScenario<LoginActivity> activityScenario = ActivityScenario.launch(LoginActivity.class);
     }
 
 
     @Test
     public void loginActivityUITest() {
+        ActivityScenario.launch(LoginActivity.class);
         assertHasBackground(R.id.login_container, R.drawable.backgo4lunch);
         assertHasDrawable(R.id.logo, R.drawable.logo);
         assertDisplayed(R.id.login_mail_btn);

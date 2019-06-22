@@ -102,6 +102,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         UserHelper.deleteUser(getCurrentUser().getUid());
     }
 
+    /**
+     * Allows to get the AuthCredential needed to re authenticate user if he want delete his account.
+     * @param provider the provider used by user to login
+     * @param idpToken a token generated when user login
+     * @param idpSecret a token generated only if user use twitter
+     * @return the AuthCredential needed to reauthenticate with FirebaseAuth
+     */
     private AuthCredential getAuthCredential(String provider, String idpToken, String idpSecret) {
         switch (provider) {
             case GoogleAuthProvider.PROVIDER_ID:

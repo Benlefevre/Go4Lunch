@@ -56,6 +56,8 @@ public class HomeActivityTest {
     private UiDevice mUiDevice;
     private View mDecorView;
 
+//    Those tests need that one user be log and that the default LatLng is (48.8332/2.38657)
+
     @Rule
     public ActivityScenarioRule<HomeActivity> mHomeActivityActivityScenarioRule = new ActivityScenarioRule<>(HomeActivity.class);
 

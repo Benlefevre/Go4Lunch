@@ -5,7 +5,7 @@
     <string name="fb_login_protocol_scheme">fb296011911276762</string>
 
     <string name="auth_failed">L\'identification a échoué, merci de réessayer.</string>
-    <string name="network_access">Un accès réseau is nécessaire pour vous identifier</string>
+    <string name="network_access">Un accès réseau est nécessaire pour vous identifier</string>
     <string name="unknown_error">Il y a une erreur inconnue</string>
     <string name="your_lunch">VOTRE DEJEUNER</string>
     <string name="settings">PARAMETRES</string>
@@ -34,7 +34,7 @@
     <string name="available_workmates">Collègues disponibles</string>
     <string name="deny">Refuser</string>
     <string name="allow">Accepter</string>
-    <string name="without_location">Sans les permissions de location, nous ne pouvons pas vous localiser et afficher les restaurants se trouvant autour de vous.</string>
+    <string name="without_location">Sans les permissions de localisation, nous ne pouvons pas vous localiser et afficher les restaurants se trouvant autour de vous.</string>
     <string name="why_location">Pourquoi avons-nous besoin de ces permissions?</string>
     <string name="restaurant_opening_hour">restaurant_opening_hour</string>
     <string name="restaurant_address">restaurant_address</string>

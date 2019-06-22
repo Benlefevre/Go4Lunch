@@ -25,7 +25,7 @@ public class Constants {
     public static final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     public static final String PERMISSION_GRANTED = "permission";
 
-    public static final LatLng DEFAULT_LOCATION = new LatLng(48.852686, 2.337957);
+    public static final LatLng DEFAULT_LOCATION = new LatLng(48.8332, 2.38657);
 
     public static final String ORIGIN = "origin";
     public static final String ID_LIST = "idList";

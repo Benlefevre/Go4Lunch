@@ -71,7 +71,7 @@ public class NotificationHandler extends Worker {
      * Fetches in Firestore the users who has chose the fetched restaurant
      */
     private void fetchRestaurantNbUserInFirestore() {
-        UserHelper.getUsersCollection().whereEqualTo("restaurantName", mRestaurantName)
+        UserHelper.getUsersCollection().whereEqualTo("restaurantId", mRestaurantId)
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots != null) {
                 for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
