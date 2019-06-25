@@ -102,7 +102,7 @@ public class RestaurantActivity extends BaseActivity {
      */
     private void initRecyclerView() {
         getSupportFragmentManager().beginTransaction().replace(R.id.activity_restaurant_frame_layout,
-                RecyclerViewFragment.newInstance(RESTAURANT_ACTIVITY, mRestaurantName)).commit();
+                RecyclerViewFragment.newInstance(RESTAURANT_ACTIVITY, mRestaurantUid)).commit();
     }
 
     /**

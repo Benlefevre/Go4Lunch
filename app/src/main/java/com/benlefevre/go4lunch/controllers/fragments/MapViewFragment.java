@@ -329,7 +329,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             for (Place place : mPlaceList) {
                 int count = 0;
                 for (User user : mUserList) {
-                    if (user.getRestaurantName() != null && user.getRestaurantName().equals(place.getName())) {
+                    if (user.getRestaurantId() != null && user.getRestaurantId().equals(place.getId())) {
                         count++;
                     }
                 }

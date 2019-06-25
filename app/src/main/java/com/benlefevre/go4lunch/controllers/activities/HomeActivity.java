@@ -269,6 +269,7 @@ public class HomeActivity extends BaseActivity implements NavigationView.OnNavig
                     UIUtil.hideKeyboard(this);
                     recyclerViewFragment.showSelectedRestaurant(selectedItem);
                 }
+                break;
         }
     }
 

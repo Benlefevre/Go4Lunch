@@ -55,6 +55,7 @@ public class RecyclerViewFragment extends Fragment {
     private String origin;
     private List<String> mIdList;
     private String mRestaurantName;
+    private String mRestaurantId;
     private List<Restaurant> mRestaurantList;
     private RestaurantAdapter mRestaurantAdapter;
 
@@ -71,11 +72,11 @@ public class RecyclerViewFragment extends Fragment {
         return fragment;
     }
 
-    public static RecyclerViewFragment newInstance(String origin, String restaurantName) {
+    public static RecyclerViewFragment newInstance(String origin, String restaurantId) {
         RecyclerViewFragment fragment = new RecyclerViewFragment();
         Bundle args = new Bundle();
         args.putString(ORIGIN, origin);
-        args.putString(RESTAURANT_NAME, restaurantName);
+        args.putString(RESTAURANT_ID, restaurantId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -122,7 +123,7 @@ public class RecyclerViewFragment extends Fragment {
                 break;
             case RESTAURANT_ACTIVITY:
                 if (getArguments() != null) {
-                    mRestaurantName = getArguments().getString(RESTAURANT_NAME);
+                    mRestaurantId = getArguments().getString(RESTAURANT_ID);
                     configureRecyclerViewForActivityRestaurant();
                 }
                 break;
@@ -134,7 +135,7 @@ public class RecyclerViewFragment extends Fragment {
      * the requested collection.
      */
     private void configureRecyclerViewForActivityRestaurant() {
-        Query query = UserHelper.getUsersCollection().whereEqualTo("restaurantName", mRestaurantName);
+        Query query = UserHelper.getUsersCollection().whereEqualTo("restaurantId", mRestaurantId);
         FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
                 .setQuery(query, User.class)
                 .setLifecycleOwner(this)

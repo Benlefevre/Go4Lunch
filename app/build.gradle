@@ -31,12 +31,12 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0-beta01'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 //    Androidx Preferences
     implementation 'androidx.preference:preference:1.1.0-beta01'
 //    WorkManager
-    implementation 'androidx.work:work-runtime:2.1.0-beta01'
+    implementation 'androidx.work:work-runtime:2.1.0-beta02'
 //    Multidex
     implementation 'com.android.support:multidex:1.0.3'
 //    Material Design
@@ -45,10 +45,10 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 //    Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.9'
-    implementation 'com.google.firebase:firebase-auth:17.0.0'
-    implementation 'com.google.firebase:firebase-firestore:19.0.2'
-    implementation 'com.google.firebase:firebase-messaging:18.0.0'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-auth:18.0.0'
+    implementation 'com.google.firebase:firebase-firestore:20.1.0'
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
 //    Firebase UI
     implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
     implementation 'com.firebaseui:firebase-ui-firestore:5.0.0'
@@ -63,13 +63,13 @@ dependencies {
 //    KeyboardVisibilityEvent
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0'
 //    Google Map
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 //    Google Map Utils
     implementation 'com.google.maps.android:android-maps-utils:0.5'
 //    Google Places
     implementation 'com.google.android.libraries.places:places:1.1.0'
 //    Google Play Location
-    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 
 
 //    Test
