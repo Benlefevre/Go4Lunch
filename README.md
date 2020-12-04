@@ -60,7 +60,7 @@ After these operations the app is ready.
 
 You can find a french documentation video  at :
 
-    - assets/documentation/demo.mp4
+    - https://github.com/Benlefevre/Go4Lunch/blob/master/assets/documentation/demo.mp4
 
 ![demo](assets/documentation/demo.gif)
 
